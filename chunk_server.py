@@ -40,18 +40,24 @@ class ChunkServer:
 
     def delete_chunk(self, chunk_path):
         local_path = self.chunk_filename(chunk_path)
-        dir = os.path.dirname(local_path)
-        self.make_sure_path_exists(dir)
+        ldir = os.path.dirname(local_path)
+        self.make_sure_path_exists(ldir)
         if os.path.exists(local_path):
             os.remove(local_path)
             return "ok"
         else:
             return "not_ok"
 
+    def replicate_chunk(self, chunk_path, cs_addr):
+        cs = ServerProxy(cs_addr)
+        chunk = self.get_chunk(chunk_path)
+        cs.upload_chunk(chunk_path, chunk)
+
     def chunk_filename(self, chunk_path):
         return self.local_fs_root + chunk_path
 
-    def make_sure_path_exists(self, path):
+    @staticmethod
+    def make_sure_path_exists(path):
         try:
             os.makedirs(path)
         except OSError as exception:
