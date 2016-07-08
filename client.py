@@ -6,6 +6,7 @@ from xmlrpc.client import ServerProxy
 class Client:
     def __init__(self, addr):
         self.ns = ServerProxy(addr)
+        self.chunk_servers = []
 
     def start(self):
         print('send test request to ns')
@@ -37,8 +38,29 @@ class Client:
             for chunk in chunks:
                 fw.write(chunk)
 
+#for testing purposes
+    def add_chunk_server(self, cs_addr):
+        cs = ServerProxy(cs_addr)
+        self.chunk_servers.append(cs)
+
+    def write(self):
+        for cs in self.chunk_servers:
+            cs.upload_chunk("/folder/chunk1", "123")
+
+    def read(self):
+        for cs in self.chunk_servers:
+            f = cs.get_chunk("/folder/chunk1")
+            print(f)
+
+    def delete(self):
+        for cs in self.chunk_servers:
+            cs.delete_chunk("/folder/chunk1")
 
 # first arg - NS address - http://localhost:888
 if __name__ == '__main__':
     cl = Client(sys.argv[1])
     cl.start()
+    cl.add_chunk_server("http://localhost:9999")
+    cl.write()
+    cl.read()
+    cl.delete()

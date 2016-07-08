@@ -4,6 +4,7 @@ from enum import Enum
 import sys
 import uuid
 import os
+import errno
 
 
 class Result(Enum):
@@ -15,7 +16,7 @@ class ChunkServer:
     def __init__(self, ns_addr):
         self.ns = ServerProxy(ns_addr)
         self.uuid = uuid.uuid1()
-        self.local_fs_root = "/tmp/yadfs/chunks/"
+        self.local_fs_root = "/tmp/yadfs/chunks"
         if not os.access(self.local_fs_root, os.W_OK):
             os.makedirs(self.local_fs_root)
 
@@ -24,8 +25,12 @@ class ChunkServer:
 
     def upload_chunk(self, chunk_path, chunk):
         local_path = self.chunk_filename(chunk_path)
+        print(local_path)
+        ldir = os.path.dirname(local_path)
+        self.make_sure_path_exists(ldir)
         with open(local_path, "w") as f:
             f.write(chunk)
+            return "ok"
 
     def get_chunk(self, chunk_path):
         local_path = self.chunk_filename(chunk_path)
@@ -35,17 +40,25 @@ class ChunkServer:
 
     def delete_chunk(self, chunk_path):
         local_path = self.chunk_filename(chunk_path)
+        dir = os.path.dirname(local_path)
+        self.make_sure_path_exists(dir)
         if os.path.exists(local_path):
             os.remove(local_path)
-            return Result.ok
+            return "ok"
         else:
-            return Result.not_ok
+            return "not_ok"
 
     def chunk_filename(self, chunk_path):
-        return self.local_fs_root + "/" + chunk_path
+        return self.local_fs_root + chunk_path
 
+    def make_sure_path_exists(self, path):
+        try:
+            os.makedirs(path)
+        except OSError as exception:
+            if exception.errno != errno.EEXIST:
+                raise
 
-# ars: host and port: localhost 999
+# ars: host and port: localhost 9999
 if __name__ == '__main__':
     if len(sys.argv) < 3:
         print("You have to specify host and port!")
@@ -55,5 +68,5 @@ if __name__ == '__main__':
 
     server = SimpleXMLRPCServer((host, port))
     server.register_introspection_functions()
-    server.register_instance(ChunkServer())
+    server.register_instance(ChunkServer("http://localhost:8888"))
     server.serve_forever()
