@@ -28,12 +28,18 @@ class FileNode:
         if path == self.name:
             return self
 
-        if path[0] == '/':
-            path = path[1:]
+        ch_name, ch_path = self._extract_child_path_and_name(path)
 
-        if path[len(path) - 1] == '/':
-            path = path[:-1]
+        for child in self.children:
+            if child.name == ch_name:
+                return child.find_path(ch_path)
 
+        # return None if file\directory was not found
+        return None
+
+    @staticmethod
+    def _extract_child_path_and_name(path):
+        path = path.strip('/')
         next_sep = path.find('/')
 
         # if path does not contain sub-folders
@@ -42,18 +48,32 @@ class FileNode:
             ch_name = path
             ch_path = path
         else:
-
             # if path contains sub-folders than extract child name from the path and recursively look
             # in child sub-folders
             ch_name = path[0:next_sep]
             ch_path = path[next_sep + 1:]
+        return ch_name, ch_path
 
-        for child in self.children:
-            if child.name == ch_name:
-                return child.find_path(ch_path)
+    # recursively creates directory or directories from path
+    # it returns error if already exists file with the same name as directory
+    def create_dir(self, path):
+        ch_name, ch_path = self._extract_child_path_and_name(path)
 
-        # return None if file\directory was not found
-        return None
+        # check if directory if already created
+        dir = next((x for x in self.children if x.name == ch_name), [None])[0]
+        if dir is None:
+            dir = FileNode(ch_name, NodeType.directory)
+            self.add_child(dir)
+
+        elif dir.type == NodeType.file:
+            return "Error! File already exists"
+
+        # if path does not have any sub-folders
+        if ch_name == ch_path:
+            return "Ok"
+
+        # create directories for sub-folders
+        return dir.create_dir(ch_path)
 
 
 class NameServer:

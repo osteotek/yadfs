@@ -55,6 +55,14 @@ class FileNodeTests(unittest.TestCase):
 
         self.assertEqual(None, self.root.find_path("/usr/ans"))
 
+    def test_create_directory(self):
+        r = self.root.create_dir("/etc/nginx/log")
+        self.assertEquals("Ok", r)
+
+        dir = self.root.find_path("/etc/nginx/log")
+        self.assertEquals("log", dir.name)
+        self.assertEquals("nginx", dir.parent.name)
+        self.assertEquals("etc", dir.parent.parent.name)
 
 if __name__ == '__main__':
     unittest.main()
