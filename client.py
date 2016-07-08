@@ -38,7 +38,7 @@ class Client:
             for chunk in chunks:
                 fw.write(chunk)
 
-#for testing purposes
+# for testing purposes
     def add_chunk_server(self, cs_addr):
         cs = ServerProxy(cs_addr)
         self.chunk_servers.append(cs)
