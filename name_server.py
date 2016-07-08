@@ -22,8 +22,38 @@ class FileNode:
         self.children.append(child)
         child.parent = self
 
-    def find_path(self):
-        pass
+    # find file node by path like (/dir/ReadMe.txt)
+    # first '/' is a path from the current node
+    def find_path(self, path):
+        if path == self.name:
+            return self
+
+        if path[0] == '/':
+            path = path[1:]
+
+        if path[len(path) - 1] == '/':
+            path = path[:-1]
+
+        next_sep = path.find('/')
+
+        # if path does not contain sub-folders
+        # find child by the path
+        if next_sep == -1:
+            ch_name = path
+            ch_path = path
+        else:
+
+            # if path contains sub-folders than extract child name from the path and recursively look
+            # in child sub-folders
+            ch_name = path[0:next_sep]
+            ch_path = path[next_sep + 1:]
+
+        for child in self.children:
+            if child.name == ch_name:
+                return child.find_path(ch_path)
+
+        # return None if file\directory was not found
+        return None
 
 
 class NameServer:
