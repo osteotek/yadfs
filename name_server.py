@@ -66,7 +66,7 @@ class FileNode:
             self.add_child(dir)
 
         elif dir.type == NodeType.file:
-            return "Error! File already exists"
+            return "Error", "Can't create directory because of wrong file name"
 
         # if path does not have any sub-folders
         if ch_name == ch_path:
@@ -75,6 +75,8 @@ class FileNode:
         # create directories for sub-folders
         return dir.create_dir(ch_path)
 
+    def create_file(self, path):
+        pass
 
 class NameServer:
     def __init__(self):
@@ -94,7 +96,7 @@ class NameServer:
         return "ok"
 
     def make_directory(self, path):
-        return "ok"
+        return self.root.create_dir(path)
 
     def list_directory(self, path):
         return "ok"
