@@ -22,7 +22,7 @@ class NameServer:
         return "ok"
 
 
-# ars: host and port
+# ars: host and port: localhost 888
 if __name__ == '__main__':
     if len(sys.argv) < 3:
         print("You have to specify host and port!")
