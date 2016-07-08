@@ -1,0 +1,2 @@
+class NameServer:
+    pass
