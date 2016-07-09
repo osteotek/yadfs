@@ -21,7 +21,7 @@ class Client:
         print(r)
 
     @staticmethod
-    def splitfile(self, filename, chunksize=1024):
+    def split_file(self, filename, chunksize=1024):
         if not os.path.isfile(filename):
             raise IOError('No such file as: {0}'.format(filename))
 
@@ -34,12 +34,12 @@ class Client:
             for i in range(n_chunks + 1):
                 data = fr.read(chunksize)
                 chunks.append(data)
-                #with open(filename + "_{0}".format(str(i)), 'xb') as fw:
+                # with open(filename + "_{0}".format(str(i)), 'xb') as fw:
                 #    fw.write(data)
             return chunks
 
     @staticmethod
-    def combinefile(self, filename, chunks):
+    def combine_file(self, filename, chunks):
         if os.path.isfile(filename):
             raise IOError('Such file already exists: {0}'.format(filename))
 
