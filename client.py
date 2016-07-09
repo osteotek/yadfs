@@ -1,12 +1,19 @@
 import os
-import sys
 from xmlrpc.client import ServerProxy
+from enum import Enum
 
+
+class FileType(Enum):
+    none = 0
+    file = 1
+    directory = 2
 
 class Client:
-    def __init__(self, addr):
-        self.ns = ServerProxy(addr)
+    def __init__(self):
         self.chunk_servers = []
+        if not os.getenv('YAD_NS'):
+            os.environ["YAD_NS"] = "http://localhost:8888"
+            self.ns = ServerProxy(os.environ["YAD_NS"])
 
     def start(self):
         print('send test request to ns')
@@ -40,7 +47,30 @@ class Client:
             for chunk in chunks:
                 fw.write(chunk)
 
-# for testing purposes
+    def list_dir(self, dir_path):
+        ls = self.ns.list_directory(dir_path)
+        return ls
+
+    def create_dir(self, path):
+        res = self.ns.make_directory(path)
+        return res
+
+    def delete_dir(self, path):
+        res = self.ns.delete_dir(path)
+        return res
+
+    def create_file(self, path, content):
+        res = self.ns.create_file(path, content)
+        return res
+
+    def delete_file(self, path):
+        res = self.ns.delete_file(path)
+        return res
+
+    def path_status(self, path):
+        return "neither"
+
+    # for testing purposes
     def add_chunk_server(self, cs_addr):
         cs = ServerProxy(cs_addr)
         self.chunk_servers.append(cs)
@@ -58,11 +88,13 @@ class Client:
         for cs in self.chunk_servers:
             cs.delete_chunk("/folder/chunk1")
 
-# first arg - NS address - http://localhost:888
-if __name__ == '__main__':
-    cl = Client(sys.argv[1])
-    cl.start()
-    cl.add_chunk_server("http://localhost:9999")
-    cl.write()
-    cl.read()
-    cl.delete()
+
+# # first arg - NS address - http://localhost:888
+# if __name__ == '__main__':
+#     cl = Client(sys.argv[1])
+#
+    # cl.start()
+    # cl.add_chunk_server("http://localhost:9999")
+    # cl.write()
+    # cl.read()
+    # cl.delete()
