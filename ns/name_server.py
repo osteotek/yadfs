@@ -1,8 +1,7 @@
 import sys
 from xmlrpc.server import SimpleXMLRPCServer
-
-from file_node import NodeType, FileNode
-
+from ns.file_node import FileNode
+from enums import NodeType, Status
 
 class NameServer:
     def __init__(self):
@@ -19,25 +18,28 @@ class NameServer:
     # data.path = full path to the file
     # data.size = file size
     # data.chunks = {'chunk_name_1': cs-1, 'chunk_name_2': cs-2} /dictionary
+    # returns { 'status': Status.ok } in case of success
     def create_file(self, data):
         file = self.root.create_file(data['path'])
         if file == "Error":
-            return "Error"
+            return {'status': Status.error}
 
         file.size = data['size']
         for k, v in data['chunks'].items():
             file.chunks[k] = [v]
 
-        return "ok"
+        print("Created file " + data['path'])
+        return {'status': Status.ok}
 
     # delete file by specified path
     def delete_file(self, path):
-        return "ok"
+        return {'status': Status.ok}
 
     # get file info by given file path
     # path format: /my_dir/index/some.file
     # response format:
-    # { 'path': '/my_dir/index/some.file' - full path for directory
+    # { 'status': Status.ok
+    #   'path': '/my_dir/index/some.file' - full path for directory
     #   'size': 2014 - size in bytes
     #   'chunks': { cs - name of chunk server, path - path to the chunk
     #       'some.file_0': { 'cs': 'cs-2', 'path': '/my_dir/index/some.file_0'},
@@ -46,18 +48,23 @@ class NameServer:
     def get_file_info(self, path):
         file = self.root.find_path(path)
         if file is None:
-            return "Not Found"
+            return {'status': Status.not_found}
 
         chunks = {}
         for c_name, val in file.chunks.items():
             chunks[c_name] = {'cs': val[0], 'path': file.get_full_dir_path() + '/' + c_name}
 
-        return {'path': file.get_full_path(), 'size': file.size, 'chunks': chunks}
+        return {'status': Status.ok,
+                'path': file.get_full_path(),
+                'size': file.size,
+                'chunks': chunks}
 
     def make_directory(self, path):
         directory = self.root.create_dir(path)
         if directory == "Error":
-            return "Error"
+            return {'status': Status.error}
+
+        return {'status': Status.ok}
 
     # execute ls command in directory
     def list_directory(self, path):

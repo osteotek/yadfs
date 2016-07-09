@@ -1,5 +1,7 @@
 import unittest
-from file_node import NodeType, FileNode
+
+from ns.file_node import FileNode
+from enums import NodeType
 
 
 class FileNodeTests(unittest.TestCase):

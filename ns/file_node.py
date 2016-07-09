@@ -1,10 +1,6 @@
-from enum import Enum
 import os
 
-
-class NodeType(Enum):
-    file = 1
-    directory = 2
+from enums import NodeType
 
 
 class FileNode:
