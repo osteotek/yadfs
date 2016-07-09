@@ -20,8 +20,40 @@ class Client:
         r = self.ns.list_directory('/')
         print(r)
 
+    def list_dir(self, dir_path):
+        ls = self.ns.list_directory(dir_path)
+        return ls
+
+    def create_dir(self, path):
+        res = self.ns.make_directory(path)
+        return res
+
+    def delete_dir(self, path):
+        res = self.ns.delete_dir(path)
+        return res
+
+    def create_file(self, path, content):
+        cs_addr = self._get_cs(path)
+        cs = ServerProxy(cs_addr) 
+        chunks = self.split_file(path)
+        for count, chunk in enumerate(chunks):
+            cs.upload_chunk(path + '_{0}'.format(str(count)), chunk)
+        res = self.ns.create_file(path, content)
+        return res
+
+    def delete_file(self, path):
+        res = self.ns.delete_file(path)
+        return res
+
+    def path_status(self, path):
+        return "neither"
+
+    def _get_cs(self, path):
+        res = self.ns.get_cs(path)
+        return res
+
     @staticmethod
-    def split_file(self, filename, chunksize=1024):
+    def split_file(filename, chunksize=1024):
         if not os.path.isfile(filename):
             raise IOError('No such file as: {0}'.format(filename))
 
@@ -39,36 +71,13 @@ class Client:
             return chunks
 
     @staticmethod
-    def combine_file(self, filename, chunks):
+    def combine_file(filename, chunks):
         if os.path.isfile(filename):
             raise IOError('Such file already exists: {0}'.format(filename))
 
         with open(filename, 'x') as fw:
             for chunk in chunks:
                 fw.write(chunk)
-
-    def list_dir(self, dir_path):
-        ls = self.ns.list_directory(dir_path)
-        return ls
-
-    def create_dir(self, path):
-        res = self.ns.make_directory(path)
-        return res
-
-    def delete_dir(self, path):
-        res = self.ns.delete_dir(path)
-        return res
-
-    def create_file(self, path, content):
-        res = self.ns.create_file(path, content)
-        return res
-
-    def delete_file(self, path):
-        res = self.ns.delete_file(path)
-        return res
-
-    def path_status(self, path):
-        return "neither"
 
     # for testing purposes
     def add_chunk_server(self, cs_addr):
