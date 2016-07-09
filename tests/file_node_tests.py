@@ -62,28 +62,28 @@ class FileNodeTests(unittest.TestCase):
         self.assertNotEqual("Error", r)
 
         dir = self.root.find_path("/etc/nginx/log")
-        self.assertEquals("log", dir.name)
-        self.assertEquals("nginx", dir.parent.name)
-        self.assertEquals("etc", dir.parent.parent.name)
+        self.assertEqual("log", dir.name)
+        self.assertEqual("nginx", dir.parent.name)
+        self.assertEqual("etc", dir.parent.parent.name)
 
     def test_create_file_dir(self):
         self.root.create_dir("/etc/nginx/")
         f1 = self.root.create_file("/etc/nginx/file_dir1/file_dir2/my_file")
 
         f2 = self.root.find_path("/etc/nginx/file_dir1/file_dir2/my_file")
-        self.assertEquals(f1, f2)
+        self.assertEqual(f1, f2)
 
     def test_full_path(self):
         f = self.root.create_file("/etc/nginx/file_dir1/file_dir2/my_file")
-        self.assertEquals("/etc/nginx/file_dir1/file_dir2/my_file", f.get_full_path())
+        self.assertEqual("/etc/nginx/file_dir1/file_dir2/my_file", f.get_full_path())
 
     def test_full_directory_path_from_file(self):
         f = self.root.create_file("/etc/nginx/another/f1/f2/my_file")
-        self.assertEquals("/etc/nginx/another/f1/f2", f.get_full_dir_path())
+        self.assertEqual("/etc/nginx/another/f1/f2", f.get_full_dir_path())
 
     def test_full_directory_path_from_dir(self):
         f = self.root.create_dir("/etc/nginx/another/f1/f2/f3")
-        self.assertEquals("/etc/nginx/another/f1/f2/f3", f.get_full_dir_path())
+        self.assertEqual("/etc/nginx/another/f1/f2/f3", f.get_full_dir_path())
 
 if __name__ == '__main__':
     unittest.main()

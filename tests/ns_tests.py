@@ -11,13 +11,13 @@ class NSTests(unittest.TestCase):
 
     def test_put_and_read_file(self):
         r = self.ns.create_file({'path': '/var/some_dir/file', 'size': 1042, 'chunks': {'file_01': 'cs-1'}})
-        self.assertEquals(Status.ok, r['status'])
+        self.assertEqual(Status.ok, r['status'])
 
         d = self.ns.get_file_info('/var/some_dir/file')
-        self.assertEquals(Status.ok, d['status'])
-        self.assertEquals(1042, d['size'])
-        self.assertEquals(d['chunks']['file_01']['cs'], 'cs-1')
-        self.assertEquals(d['chunks']['file_01']['path'], '/var/some_dir/file_01')
+        self.assertEqual(Status.ok, d['status'])
+        self.assertEqual(1042, d['size'])
+        self.assertEqual(d['chunks']['file_01']['cs'], 'cs-1')
+        self.assertEqual(d['chunks']['file_01']['path'], '/var/some_dir/file_01')
 
     def test_list_directory(self):
         self.ns.create_file({'path': '/var/some_dir/file1', 'size': 1042, 'chunks': {'file1_01': 'cs-1'}})
@@ -30,7 +30,7 @@ class NSTests(unittest.TestCase):
                  {'name': 'file2', 'type': NodeType.file},
                  {'name': 'usr', 'type': NodeType.directory}]
 
-        self.assertEquals(Status.ok, r['status'])
+        self.assertEqual(Status.ok, r['status'])
         self.assertListEqual(items, r['items'])
 
 
