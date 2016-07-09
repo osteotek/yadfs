@@ -13,10 +13,14 @@ class FileNode:
         self.parent = None
         self.children = []
         self.type = node_type
-        self.size = 0 # size in bytes
+        self.size = 0  # size in bytes
 
         # dictionary of file chunks, empty for the directory
         self.chunks = {}
+
+    @property
+    def is_root(self):
+        return self.parent is None
 
     def add_child(self, child):
         self.children.append(child)
@@ -106,3 +110,21 @@ class FileNode:
         file = FileNode(f_name, NodeType.file)
         directory.add_child(file)
         return file
+
+    # returns full path of the node
+    # like /var/img/my_file.txt
+    def get_full_path(self):
+        if self.is_root:
+            return ''
+        else:
+            return self.parent.get_full_path() + '/' + self.name
+
+    def get_full_dir_path(self):
+        if self.is_root:
+            return ''
+
+        path = self.parent.get_full_dir_path()
+        if self.type == NodeType.directory:
+            path += '/' + self.name
+
+        return path

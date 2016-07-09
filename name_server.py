@@ -21,18 +21,38 @@ class NameServer:
     # data.chunks = {'chunk_name_1': cs-1, 'chunk_name_2': cs-2} /dictionary
     def create_file(self, data):
         file = self.root.create_file(data['path'])
-
         if file == "Error":
             return "Error"
-        else:
-            return "ok"
+
+        file.size = data['size']
+        for k, v in data['chunks'].items():
+            file.chunks[k] = [v]
+
+        return "ok"
 
     # delete file by specified path
     def delete_file(self, path):
         return "ok"
 
-    def locate_file(self, path):
-        return "ok"
+    # get file info by given file path
+    # path format: /my_dir/index/some.file
+    # response format:
+    # { 'path': '/my_dir/index/some.file' - full path for directory
+    #   'size': 2014 - size in bytes
+    #   'chunks': { cs - name of chunk server, path - path to the chunk
+    #       'some.file_0': { 'cs': 'cs-2', 'path': '/my_dir/index/some.file_0'},
+    #       'some.file_1': { 'cs': 'cs-1', 'path': '/my_dir/index/some.file_1'}
+    #   }
+    def get_file_info(self, path):
+        file = self.root.find_path(path)
+        if file is None:
+            return "Not Found"
+
+        chunks = {}
+        for c_name, val in file.chunks.items():
+            chunks[c_name] = {'cs': val[0], 'path': file.get_full_dir_path() + '/' + c_name}
+
+        return {'path': file.get_full_path(), 'size': file.size, 'chunks': chunks}
 
     def make_directory(self, path):
         directory = self.root.create_dir(path)

@@ -1,5 +1,4 @@
 import unittest
-from name_server import FileNode
 from file_node import NodeType, FileNode
 
 
@@ -71,6 +70,18 @@ class FileNodeTests(unittest.TestCase):
 
         f2 = self.root.find_path("/etc/nginx/file_dir1/file_dir2/my_file")
         self.assertEquals(f1, f2)
+
+    def test_full_path(self):
+        f = self.root.create_file("/etc/nginx/file_dir1/file_dir2/my_file")
+        self.assertEquals("/etc/nginx/file_dir1/file_dir2/my_file", f.get_full_path())
+
+    def test_full_directory_path_from_file(self):
+        f = self.root.create_file("/etc/nginx/another/f1/f2/my_file")
+        self.assertEquals("/etc/nginx/another/f1/f2", f.get_full_dir_path())
+
+    def test_full_directory_path_from_dir(self):
+        f = self.root.create_dir("/etc/nginx/another/f1/f2/f3")
+        self.assertEquals("/etc/nginx/another/f1/f2/f3", f.get_full_dir_path())
 
 if __name__ == '__main__':
     unittest.main()
