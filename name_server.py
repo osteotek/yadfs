@@ -9,13 +9,14 @@ class NodeType(Enum):
 
 
 class FileNode:
-    def __init__(self, name, node_type):
+    def __init__(self, name, node_type, size = None):
         self.name = name
         self.parent = None
         self.children = []
         self.type = node_type
+        self.size = size
 
-        # list of file chunks, empty for the directory
+        # dictionary of file chunks, empty for the directory
         self.chunks = {}
 
     def add_child(self, child):
@@ -78,31 +79,31 @@ class FileNode:
         ch_name, ch_path = self._extract_child_path_and_name(path)
 
         # check if directory if already created
-        dir = next((x for x in self.children if x.name == ch_name), None)
-        if dir is None:
-            dir = FileNode(ch_name, NodeType.directory)
+        directory = next((x for x in self.children if x.name == ch_name), None)
+        if directory is None:
+            directory = FileNode(ch_name, NodeType.directory)
             self.add_child(dir)
 
-        elif dir.type == NodeType.file:
+        elif directory.type == NodeType.file:
             print("Can't create directory because of wrong file name " + ch_name)
             return "Error"
 
         # if path does not have any sub-folders
         if ch_name == ch_path:
-            return dir
+            return directory
 
         # create directories for sub-folders
-        return dir.create_dir(ch_path)
+        return directory.create_dir(ch_path)
 
-    def create_file(self, path):
-        f_name, f_dir = self._extract_file_name_and_file_dir(path)
-        dir = self.create_dir(f_dir)
+    def create_file(self, data):
+        f_name, f_dir = self._extract_file_name_and_file_dir(data['path'])
+        directory = self.create_dir(f_dir)
 
-        if dir == "Error":
-            return dir
+        if directory == "Error":
+            return 'Error'
 
-        file = FileNode(f_name, NodeType.file)
-        dir.add_child(file)
+        file = FileNode(f_name, NodeType.file, data['size'])
+        directory.add_child(file)
         return file
 
 
@@ -113,6 +114,8 @@ class NameServer:
     # get name where to put CS file
     # path in format like /my_dir/usr/new_file
     def get_cs(self, path):
+        if self.root.find_path(path) != None:
+            raise IOError('file already exists')
         return "cs-1"
 
     # create file in NS after its chunks were created in CS
@@ -120,7 +123,7 @@ class NameServer:
     # data.size = file size
     # data.chunks = {'chunk_name_1': cs-1, 'chunk_name_2': cs-2} /dictionary
     def create_file(self, data):
-        file = self.root.create_file(data['path'])
+        file = self.root.create_file(data)
 
         if file == "Error":
             return "Error"
@@ -135,12 +138,13 @@ class NameServer:
         return "ok"
 
     def make_directory(self, path):
-        dir = self.root.create_dir(path)
-        if dir == "Error":
+        directory = self.root.create_dir(path)
+        if directory == "Error":
             return "Error"
 
     def list_directory(self, path):
-        return "ok"
+        directory = self.root.find_path(path)
+        return [f.name for f in directory.children]
 
 
 # ars: host and port: localhost 888
