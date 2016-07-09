@@ -1,5 +1,6 @@
 import unittest
-from name_server import FileNode, NodeType
+from name_server import FileNode
+from file_node import NodeType, FileNode
 
 
 class FileNodeTests(unittest.TestCase):
