@@ -67,10 +67,20 @@ class NameServer:
         return {'status': Status.ok}
 
     # execute ls command in directory
+    # response:
+    # { 'status': Status.ok,
+    #   'items': [ - list of items
+    #       {'name': item_name, 'type': NodeType},
+    #       {'name': item_name2, 'type': NodeType}]
+    # }
+    # if file not found: {'status': Status.not_found}
     def list_directory(self, path):
         directory = self.root.find_path(path)
-        return {f.name: f.type for f in directory.children}
+        if directory is None:
+            return {'status': Status.not_found}
 
+        items = ({'name': f.name, 'type': f.type} for f in directory.children)
+        return {'status': Status.ok, 'items': list(items)}
 
 # ars: host and port: localhost 888
 if __name__ == '__main__':
