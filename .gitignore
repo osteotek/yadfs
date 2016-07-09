@@ -9,6 +9,8 @@ __pycache__/
 # Idea configs
 .idea/
 
+.vscode
+
 # Distribution / packaging
 .Python
 env/
