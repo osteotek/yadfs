@@ -54,7 +54,7 @@ class ChunkServer:
         cs.upload_chunk(chunk_path, chunk)
 
     def chunk_filename(self, chunk_path):
-        return self.local_fs_root + chunk_path
+        return os.path.join(self.local_fs_root, chunk_path)
 
     @staticmethod
     def make_sure_path_exists(path):

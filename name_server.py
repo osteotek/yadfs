@@ -57,9 +57,11 @@ class FileNode:
 
     @staticmethod
     # extract from path like /usr/bin/file.txt - file.txt and /usr/bin
+    # os.path.split(path) does exactly that
     def _extract_file_name_and_file_dir(path):
         path = path.strip('/')
         sep = path.rfind('/')
+        os.path
 
         # if path does not contain sub-folders
         # find child by the path
@@ -115,7 +117,7 @@ class NameServer:
     # path in format like /my_dir/usr/new_file
     def get_cs(self, path):
         if self.root.find_path(path) != None:
-            raise IOError('file already exists')
+            return 'file already exists'
         return "cs-1"
 
     # create file in NS after its chunks were created in CS
@@ -144,7 +146,7 @@ class NameServer:
 
     def list_directory(self, path):
         directory = self.root.find_path(path)
-        return [f.name for f in directory.children]
+        return {f.name:f.type for f in directory.children}
 
 
 # ars: host and port: localhost 888
