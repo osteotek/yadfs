@@ -9,12 +9,12 @@ class NodeType(Enum):
 
 
 class FileNode:
-    def __init__(self, name, node_type, size = None):
+    def __init__(self, name, node_type):
         self.name = name
         self.parent = None
         self.children = []
         self.type = node_type
-        self.size = size
+        self.size = 0 # size in bytes
 
         # dictionary of file chunks, empty for the directory
         self.chunks = {}
@@ -97,14 +97,14 @@ class FileNode:
         # create directories for sub-folders
         return directory.create_dir(ch_path)
 
-    def create_file(self, data):
-        f_name, f_dir = self._extract_file_name_and_file_dir(data['path'])
+    def create_file(self, path):
+        f_name, f_dir = self._extract_file_name_and_file_dir(path)
         directory = self.create_dir(f_dir)
 
         if directory == "Error":
             return 'Error'
 
-        file = FileNode(f_name, NodeType.file, data['size'])
+        file = FileNode(f_name, NodeType.file)
         directory.add_child(file)
         return file
 
@@ -116,7 +116,7 @@ class NameServer:
     # get name where to put CS file
     # path in format like /my_dir/usr/new_file
     def get_cs(self, path):
-        if self.root.find_path(path) != None:
+        if self.root.find_path(path) is not None:
             return 'file already exists'
         return "cs-1"
 
@@ -125,7 +125,7 @@ class NameServer:
     # data.size = file size
     # data.chunks = {'chunk_name_1': cs-1, 'chunk_name_2': cs-2} /dictionary
     def create_file(self, data):
-        file = self.root.create_file(data)
+        file = self.root.create_file(data['path'])
 
         if file == "Error":
             return "Error"
@@ -144,9 +144,10 @@ class NameServer:
         if directory == "Error":
             return "Error"
 
+    # execute ls command in directory
     def list_directory(self, path):
         directory = self.root.find_path(path)
-        return {f.name:f.type for f in directory.children}
+        return {f.name: f.type for f in directory.children}
 
 
 # ars: host and port: localhost 888
