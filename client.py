@@ -13,13 +13,14 @@ class Client:
         r = self.ns.list_directory('/')
         print(r)
 
+    @staticmethod
     def splitfile(self, filename, chunksize=1024):
         if not os.path.isfile(filename):
             raise IOError('No such file as: {0}'.format(filename))
 
         filesize = os.stat(filename).st_size
 
-        with open(filename, 'rb') as fr:
+        with open(filename, 'r') as fr:
             n_chunks = filesize // chunksize
             chunks = []
             print('splitfile: No of chunks required: {0}'.format(str(n_chunks + 1)))
@@ -30,11 +31,12 @@ class Client:
                 #    fw.write(data)
             return chunks
 
+    @staticmethod
     def combinefile(self, filename, chunks):
         if os.path.isfile(filename):
             raise IOError('Such file already exists: {0}'.format(filename))
 
-        with open(filename, 'xb') as fw:
+        with open(filename, 'x') as fw:
             for chunk in chunks:
                 fw.write(chunk)
 
