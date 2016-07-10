@@ -1,11 +1,6 @@
 import os
 from xmlrpc.client import ServerProxy
-from enum import Enum
-
-class FileType(Enum):
-    none = 0
-    file = 1
-    directory = 2
+from enums import NodeType, Status
 
 
 class Client:
@@ -56,7 +51,7 @@ class Client:
     @staticmethod
     def split_file(filename, chunksize=1024):
         if not os.path.isfile(filename):
-            raise IOError('No such file as: {0}'.format(filename))
+            return Status.not_found
 
         with open(filename, 'r') as fr:
             data = fr.read()
@@ -77,7 +72,7 @@ class Client:
     @staticmethod
     def write_combined_file(filename, chunks):
         if os.path.isfile(filename):
-            raise IOError('Such file already exists: {0}'.format(filename))
+            return Status.already_exists
 
         with open(filename, 'x') as fw:
             for chunk in chunks:
