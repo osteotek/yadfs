@@ -1,11 +1,37 @@
 import sys
+import yaml
+import os
 from xmlrpc.server import SimpleXMLRPCServer
 from ns.file_node import FileNode
 from enums import NodeType, Status
 
+
 class NameServer:
-    def __init__(self):
+    def __init__(self, dump_on=True):
         self.root = FileNode('root', NodeType.directory)
+        self.dump_on = dump_on
+        self.dump_path = "name_server.yml"
+
+    # start name server
+    # init heartbeat threads
+    def start(self):
+        self._load_dump()
+
+    def _load_dump(self):
+        # try to read file from dump
+        if os.path.isfile(self.dump_path):
+            print("Try to read file tree from dump file", self.dump_path)
+            with open(self.dump_path) as f:
+                self.root = yaml.load(f)
+            print("File tree has loaded from the dump file")
+        else:
+            print("There is no detected dump file")
+
+    # dump file-tree to file if self.dump_on is True
+    def _dump(self):
+        if self.dump_on:
+            with open(self.dump_path, 'w') as outfile:
+                outfile.write(yaml.dump(self.root))
 
     # get name where to put CS file
     # path in format like /my_dir/usr/new_file
@@ -19,7 +45,13 @@ class NameServer:
     # data.size = file size
     # data.chunks = {'chunk_name_1': cs-1, 'chunk_name_2': cs-2} /dictionary
     # returns { 'status': Status.ok } in case of success
+    # Status.error - in case of error during file creation
+    # Status.already_exists - file is already created
     def create_file(self, data):
+        file = self.root.find_path(data['path'])
+        if file is not None:
+            return {'status': Status.already_exists}
+
         file = self.root.create_file(data['path'])
         if file == "Error":
             return {'status': Status.error}
@@ -28,17 +60,31 @@ class NameServer:
         for k, v in data['chunks'].items():
             file.chunks[k] = [v]
 
+        self._dump()
         print("Created file " + data['path'])
         return {'status': Status.ok}
 
-    # delete file by specified path
-    def delete_file(self, path):
+    # delete file\directory by specified path
+    # r: {'status: Status.ok} if deleted
+    # Status.error if you try to delete root
+    # Status.not_found if path not found
+    def delete(self, path):
+        item = self.root.find_path(path)
+        if item is None:
+            return {'status': Status.not_found}
+
+        if item.is_root:
+            return {'status': Status.error}
+
+        item.delete()
+        self._dump()
         return {'status': Status.ok}
 
-    # get file info by given file path
+    # get file\directory info by given path
     # path format: /my_dir/index/some.file
     # response format:
     # { 'status': Status.ok
+    #   'type': NodeType.type
     #   'path': '/my_dir/index/some.file' - full path for directory
     #   'size': 2014 - size in bytes
     #   'chunks': { cs - name of chunk server, path - path to the chunk
@@ -55,13 +101,23 @@ class NameServer:
             chunks[c_name] = {'cs': val[0], 'path': file.get_full_dir_path() + '/' + c_name}
 
         return {'status': Status.ok,
+                'type': file.type,
                 'path': file.get_full_path(),
                 'size': file.size,
                 'chunks': chunks}
 
+    # creates directory by the given path
+    # response: { 'status': Status.ok }
+    # Status.error - if error and directory not created
+    # States.already_exists - if directory is already exists by given path
     def make_directory(self, path):
-        directory = self.root.create_dir(path)
-        if directory == "Error":
+        d = self.root.find_path(path)
+
+        if d is not None:
+            return {'status': Status.already_exists}
+
+        d = self.root.create_dir(path)
+        if d == "Error":
             return {'status': Status.error}
 
         return {'status': Status.ok}
@@ -82,7 +138,18 @@ class NameServer:
         items = ({'name': f.name, 'type': f.type} for f in directory.children)
         return {'status': Status.ok, 'items': list(items)}
 
-# ars: host and port: localhost 888
+    # return size of the file\directory by the given path
+    # size of directory returns size of its children
+    # r: { 'status': Status.ok\Status.not_found, 'size': size by path}    #
+    def size_of(self, path):
+        i = self.root.find_path(path)
+        if i is None:
+            return {'status': Status.not_found, 'size': 0}
+
+        return {'status': Status.ok, 'size': i.size}
+
+
+# args: host and port: localhost 888
 if __name__ == '__main__':
     if len(sys.argv) < 3:
         print("You have to specify host and port!")
@@ -90,7 +157,10 @@ if __name__ == '__main__':
     host = sys.argv[1]
     port = int(sys.argv[2])
 
+    ns = NameServer(dump_on=True)
+    ns.start()
+
     server = SimpleXMLRPCServer((host, port))
     server.register_introspection_functions()
-    server.register_instance(NameServer())
+    server.register_instance(ns)
     server.serve_forever()

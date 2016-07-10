@@ -1,5 +1,3 @@
-import os
-
 from enums import NodeType
 
 
@@ -9,7 +7,7 @@ class FileNode:
         self.parent = None
         self.children = []
         self.type = node_type
-        self.size = 0  # size in bytes
+        self._size = 0  # size in bytes
 
         # dictionary of file chunks, empty for the directory
         self.chunks = {}
@@ -17,6 +15,17 @@ class FileNode:
     @property
     def is_root(self):
         return self.parent is None
+
+    @property
+    def size(self):
+        if self.type == NodeType.directory:
+            return sum(c.size for c in self.children)
+
+        return self._size
+
+    @size.setter
+    def size(self, value):
+        self._size = value
 
     def add_child(self, child):
         self.children.append(child)
@@ -60,7 +69,6 @@ class FileNode:
     def _extract_file_name_and_file_dir(path):
         path = path.strip('/')
         sep = path.rfind('/')
-        os.path
 
         # if path does not contain sub-folders
         # find child by the path
@@ -106,6 +114,13 @@ class FileNode:
         file = FileNode(f_name, NodeType.file)
         directory.add_child(file)
         return file
+
+    # delete node from the file tree
+    # you can't delete root!
+    def delete(self):
+        if not self.is_root:
+            self.parent.children.remove(self)
+            self.parent = None
 
     # returns full path of the node
     # like /var/img/my_file.txt
