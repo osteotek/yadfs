@@ -13,7 +13,7 @@ class Client:
         self.chunk_servers = []
         if not os.getenv('YAD_NS'):
             os.environ["YAD_NS"] = "http://localhost:8888"
-            self.ns = ServerProxy(os.environ["YAD_NS"])
+        self.ns = ServerProxy(os.environ["YAD_NS"])
 
     def start(self):
         print('send test request to ns')
@@ -34,7 +34,7 @@ class Client:
 
     def create_file(self, path, content):
         cs_addr = self._get_cs(path)
-        cs = ServerProxy(cs_addr) 
+        cs = ServerProxy(cs_addr)
         chunks = self.split_file(path)
         for count, chunk in enumerate(chunks):
             cs.upload_chunk(path + '_{0}'.format(str(count)), chunk)
@@ -58,21 +58,24 @@ class Client:
         if not os.path.isfile(filename):
             raise IOError('No such file as: {0}'.format(filename))
 
-        filesize = os.stat(filename).st_size
-
         with open(filename, 'r') as fr:
-            n_chunks = filesize // chunksize
-            chunks = []
-            print('splitfile: No of chunks required: {0}'.format(str(n_chunks + 1)))
-            for i in range(n_chunks + 1):
-                data = fr.read(chunksize)
-                chunks.append(data)
-                # with open(filename + "_{0}".format(str(i)), 'xb') as fw:
-                #    fw.write(data)
-            return chunks
+            data = fr.read()
+        chunks = []
+        while len(data) > chunksize:
+            i = chunksize
+            while not data[i].isspace():
+                if i == 0:
+                    i = chunksize
+                    break
+                else:
+                    i -= 1
+            chunks.append(data[:i])
+            data = data[i+1:]
+        chunks.append(data)
+        return chunks
 
     @staticmethod
-    def combine_file(filename, chunks):
+    def write_combined_file(filename, chunks):
         if os.path.isfile(filename):
             raise IOError('Such file already exists: {0}'.format(filename))
 
