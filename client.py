@@ -61,16 +61,16 @@ class Client:
         with open(filename, 'r') as fr:
             data = fr.read()
         chunks = []
-        while len(data) > chunksize:
-            i = chunksize
+        while len(data) >= chunksize:
+            i = chunksize+1
             while not data[i].isspace():
                 if i == 0:
-                    i = chunksize
+                    i = chunksize+1
                     break
                 else:
                     i -= 1
             chunks.append(data[:i])
-            data = data[i+1:]
+            data = data[i:]
         chunks.append(data)
         return chunks
 
