@@ -1,6 +1,7 @@
 import sys
 import yaml
 import os
+import random
 from datetime import datetime
 from xmlrpc.server import SimpleXMLRPCServer
 from ns.file_node import FileNode
@@ -12,7 +13,7 @@ class NameServer:
         self.root = FileNode('root', NodeType.directory)
         self.dump_on = dump_on
         self.dump_path = "name_server.yml"
-        self.cs_timeout = 3  # chunk server timeout in seconds
+        self.cs_timeout = 2  # chunk server timeout in seconds
         self.cs = {}  # chunk servers which should be detected by heartbeat
 
     # start name server
@@ -38,10 +39,26 @@ class NameServer:
 
     # get name where to put CS file
     # path in format like /my_dir/usr/new_file
+    # returns { 'status': Status.not_found} if there are no available cs
+    # if ok return { 'status': Status.ok, 'addr': cs_address }
     def get_cs(self, path):
         if self.root.find_path(path) is not None:
             return 'file already exists'
-        return "cs-1"
+
+        now = datetime.now()
+        live = []
+        for n, cs in self.cs.items():
+            diff = (now - cs['last_hb']).total_seconds()
+            if diff <= self.cs_timeout:
+                live.append(cs)
+
+        if len(live) == 0:
+            return {'status': Status.not_found}
+
+        i = random.randint(0, len(live) - 1)
+        cs = live[i]
+
+        return {'status': Status.ok, 'addr': cs['addr']}
 
     # create file in NS after its chunks were created in CS
     # data.path = full path to the file

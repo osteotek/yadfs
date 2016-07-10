@@ -1,5 +1,4 @@
 import unittest
-
 from enums import Status, NodeType
 from ns.name_server import NameServer
 
@@ -97,6 +96,11 @@ class NSTests(unittest.TestCase):
         r = self.ns.get_file_info('/my/dir/another')
         self.assertEquals(Status.ok, r['status'])
 
+    def test_get_cs(self):
+        self.ns.heartbeat("cs-22", "localhost:9999")
+
+        r = self.ns.get_cs('/var/something')
+        self.assertEquals('localhost:9999', r['addr'])
 
 if __name__ == '__main__':
     unittest.main()
