@@ -1,6 +1,5 @@
 import unittest
 from enums import Status, NodeType
-
 from ns.name_server import NameServer
 
 
@@ -50,6 +49,11 @@ class NSTests(unittest.TestCase):
         r = self.ns.get_file_info('/my/dir/file/my_dir')
         self.assertEquals(Status.not_found, r['status'])
 
+    def test_make_directory_already_exists(self):
+        self.ns.make_directory('/my/dir/file')
+        r = self.ns.make_directory('/my/dir/file')
+        self.assertEquals(Status.already_exists, r['status'])
+
     def test_size_of(self):
         self.ns.create_file({'path': '/my/file', 'size': 100, 'chunks': {}})
         self.ns.create_file({'path': '/my/file2', 'size': 150, 'chunks': {}})
@@ -67,6 +71,12 @@ class NSTests(unittest.TestCase):
 
         r = self.ns.size_of('/my/some/path')
         self.assertEquals(Status.not_found, r['status'])
+
+    def test_create_file_exists(self):
+        self.ns.create_file({'path': '/my/dir/file3', 'size': 200, 'chunks': {}})
+        r = self.ns.create_file({'path': '/my/dir/file3', 'size': 250, 'chunks': {}})
+
+        self.assertEquals(Status.already_exists, r['status'])
 
 if __name__ == '__main__':
     unittest.main()

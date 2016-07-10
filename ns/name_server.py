@@ -19,7 +19,13 @@ class NameServer:
     # data.size = file size
     # data.chunks = {'chunk_name_1': cs-1, 'chunk_name_2': cs-2} /dictionary
     # returns { 'status': Status.ok } in case of success
+    # Status.error - in case of error during file creation
+    # Status.already_exists - file is already created
     def create_file(self, data):
+        file = self.root.find_path(data['path'])
+        if file is not None:
+            return {'status': Status.already_exists}
+
         file = self.root.create_file(data['path'])
         if file == "Error":
             return {'status': Status.error}
@@ -61,9 +67,18 @@ class NameServer:
                 'size': file.size,
                 'chunks': chunks}
 
+    # creates directory by the given path
+    # response: { 'status': Status.ok }
+    # Status.error - if error and directory not created
+    # States.already_exists - if directory is already exists by given path
     def make_directory(self, path):
-        directory = self.root.create_dir(path)
-        if directory == "Error":
+        d = self.root.find_path(path)
+
+        if d is not None:
+            return {'status': Status.already_exists}
+
+        d = self.root.create_dir(path)
+        if d == "Error":
             return {'status': Status.error}
 
         return {'status': Status.ok}
@@ -84,11 +99,13 @@ class NameServer:
         items = ({'name': f.name, 'type': f.type} for f in directory.children)
         return {'status': Status.ok, 'items': list(items)}
 
-    # return size of the file
+    # return size of the file\directory by the given path
+    # size of directory returns size of its children
+    # r: { 'status': Status.ok\Status.not_found, 'size': size by path}    #
     def size_of(self, path):
         i = self.root.find_path(path)
         if i is None:
-            return {'status': Status.not_found}
+            return {'status': Status.not_found, 'size': 0}
 
         return {'status': Status.ok, 'size': i.size}
 
