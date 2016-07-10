@@ -1,4 +1,5 @@
 import unittest
+
 from enums import Status, NodeType
 from ns.name_server import NameServer
 
@@ -6,7 +7,7 @@ from ns.name_server import NameServer
 class NSTests(unittest.TestCase):
     def setUp(self):
         super().setUp()
-        self.ns = NameServer()
+        self.ns = NameServer(dump_on=False)
 
     def test_put_and_read_file(self):
         r = self.ns.create_file({'path': '/var/some_dir/file', 'size': 1042, 'chunks': {'file_01': 'cs-1'}})
@@ -84,6 +85,18 @@ class NSTests(unittest.TestCase):
 
         r = self.ns.get_file_info('/my/dir/file3')
         self.assertEquals(Status.not_found, r['status'])
+
+    def test_dump(self):
+        self.ns.create_file({'path': '/my/dir/file3', 'size': 200, 'chunks': {}})
+        self.ns.create_file({'path': '/my/dir/another', 'size': 200, 'chunks': {}})
+        self.ns.create_file({'path': '/my/dir/dir3/file3', 'size': 200, 'chunks': {}})
+        self.ns.create_file({'path': '/my/dir/dir5/file3', 'size': 200, 'chunks': {}})
+        self.ns._dump()
+        self.ns._load_dump()
+
+        r = self.ns.get_file_info('/my/dir/another')
+        self.assertEquals(Status.ok, r['status'])
+
 
 if __name__ == '__main__':
     unittest.main()

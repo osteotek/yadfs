@@ -2,11 +2,11 @@ import os
 from xmlrpc.client import ServerProxy
 from enum import Enum
 
-
 class FileType(Enum):
     none = 0
     file = 1
     directory = 2
+
 
 class Client:
     def __init__(self):
@@ -38,6 +38,7 @@ class Client:
         chunks = self.split_file(path)
         for count, chunk in enumerate(chunks):
             cs.upload_chunk(path + '_{0}'.format(str(count)), chunk)
+
         res = self.ns.create_file(path, content)
         return res
 

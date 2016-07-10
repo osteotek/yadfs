@@ -1,12 +1,37 @@
 import sys
+import yaml
+import os
 from xmlrpc.server import SimpleXMLRPCServer
 from ns.file_node import FileNode
 from enums import NodeType, Status
 
 
 class NameServer:
-    def __init__(self):
+    def __init__(self, dump_on=True):
         self.root = FileNode('root', NodeType.directory)
+        self.dump_on = dump_on
+        self.dump_path = "name_server.yml"
+
+    # start name server
+    # init heartbeat threads
+    def start(self):
+        self._load_dump()
+
+    def _load_dump(self):
+        # try to read file from dump
+        if os.path.isfile(self.dump_path):
+            print("Try to read file tree from dump file", self.dump_path)
+            with open(self.dump_path) as f:
+                self.root = yaml.load(f)
+            print("File tree has loaded from the dump file")
+        else:
+            print("There is no detected dump file")
+
+    # dump file-tree to file if self.dump_on is True
+    def _dump(self):
+        if self.dump_on:
+            with open(self.dump_path, 'w') as outfile:
+                outfile.write(yaml.dump(self.root))
 
     # get name where to put CS file
     # path in format like /my_dir/usr/new_file
@@ -35,6 +60,7 @@ class NameServer:
         for k, v in data['chunks'].items():
             file.chunks[k] = [v]
 
+        self._dump()
         print("Created file " + data['path'])
         return {'status': Status.ok}
 
@@ -51,6 +77,7 @@ class NameServer:
             return {'status': Status.error}
 
         item.delete()
+        self._dump()
         return {'status': Status.ok}
 
     # get file\directory info by given path
@@ -122,7 +149,7 @@ class NameServer:
         return {'status': Status.ok, 'size': i.size}
 
 
-# ars: host and port: localhost 888
+# args: host and port: localhost 888
 if __name__ == '__main__':
     if len(sys.argv) < 3:
         print("You have to specify host and port!")
@@ -130,7 +157,10 @@ if __name__ == '__main__':
     host = sys.argv[1]
     port = int(sys.argv[2])
 
+    ns = NameServer(dump_on=True)
+    ns.start()
+
     server = SimpleXMLRPCServer((host, port))
     server.register_introspection_functions()
-    server.register_instance(NameServer())
+    server.register_instance(ns)
     server.serve_forever()
