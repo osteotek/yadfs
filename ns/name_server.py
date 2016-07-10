@@ -3,6 +3,7 @@ from xmlrpc.server import SimpleXMLRPCServer
 from ns.file_node import FileNode
 from enums import NodeType, Status
 
+
 class NameServer:
     def __init__(self):
         self.root = FileNode('root', NodeType.directory)
@@ -37,8 +38,19 @@ class NameServer:
         print("Created file " + data['path'])
         return {'status': Status.ok}
 
-    # delete file by specified path
-    def delete_file(self, path):
+    # delete file\directory by specified path
+    # r: {'status: Status.ok} if deleted
+    # Status.error if you try to delete root
+    # Status.not_found if path not found
+    def delete(self, path):
+        item = self.root.find_path(path)
+        if item is None:
+            return {'status': Status.not_found}
+
+        if item.is_root:
+            return {'status': Status.error}
+
+        item.delete()
         return {'status': Status.ok}
 
     # get file\directory info by given path
@@ -108,6 +120,7 @@ class NameServer:
             return {'status': Status.not_found, 'size': 0}
 
         return {'status': Status.ok, 'size': i.size}
+
 
 # ars: host and port: localhost 888
 if __name__ == '__main__':

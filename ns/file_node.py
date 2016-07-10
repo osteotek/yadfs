@@ -1,5 +1,3 @@
-import os
-
 from enums import NodeType
 
 
@@ -71,7 +69,6 @@ class FileNode:
     def _extract_file_name_and_file_dir(path):
         path = path.strip('/')
         sep = path.rfind('/')
-        os.path
 
         # if path does not contain sub-folders
         # find child by the path
@@ -117,6 +114,13 @@ class FileNode:
         file = FileNode(f_name, NodeType.file)
         directory.add_child(file)
         return file
+
+    # delete node from the file tree
+    # you can't delete root!
+    def delete(self):
+        if not self.is_root:
+            self.parent.children.remove(self)
+            self.parent = None
 
     # returns full path of the node
     # like /var/img/my_file.txt

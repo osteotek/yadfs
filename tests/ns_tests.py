@@ -78,5 +78,12 @@ class NSTests(unittest.TestCase):
 
         self.assertEquals(Status.already_exists, r['status'])
 
+    def test_delete_file(self):
+        self.ns.create_file({'path': '/my/dir/file3', 'size': 200, 'chunks': {}})
+        self.ns.delete('/my/dir/file3')
+
+        r = self.ns.get_file_info('/my/dir/file3')
+        self.assertEquals(Status.not_found, r['status'])
+
 if __name__ == '__main__':
     unittest.main()
