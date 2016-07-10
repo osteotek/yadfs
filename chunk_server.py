@@ -2,9 +2,10 @@ from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.client import ServerProxy
 from enum import Enum
 import sys
-import uuid
 import os
 import errno
+import time
+import _thread
 
 
 class Result(Enum):
@@ -13,15 +14,31 @@ class Result(Enum):
 
 
 class ChunkServer:
-    def __init__(self, ns_addr):
+    def __init__(self, name, addr, ns_addr):
         self.ns = ServerProxy(ns_addr)
-        self.uuid = uuid.uuid1()
+        self.addr = addr
+        self.name = name
         self.local_fs_root = "/tmp/yadfs/chunks"
+        self.hb_timeout = 0.5  # heartbeat timeout in seconds
+        self.on = True
+
+    def start(self):
+        print('Init server')
         if not os.access(self.local_fs_root, os.W_OK):
+            print('Create directory for storage:', self.local_fs_root,)
             os.makedirs(self.local_fs_root)
 
-    def heartbeat(self):
-        self.ns.heartbeat(self.uuid)
+        print('Start sending heartbeats')
+        _thread.start_new_thread(self._heartbeat, ())
+        print('Server is ready')
+
+    def _heartbeat(self):
+        while self.on:
+            try:
+                self.ns.heartbeat(self.name, self.addr)
+            except:
+                pass  # ignore error during hb - send it in the next time
+            time.sleep(self.hb_timeout)
 
     def upload_chunk(self, chunk_path, chunk):
         local_path = self.chunk_filename(chunk_path)
@@ -66,13 +83,18 @@ class ChunkServer:
 
 # ars: host and port: localhost 9999
 if __name__ == '__main__':
-    if len(sys.argv) < 3:
-        print("You have to specify host and port!")
+    if len(sys.argv) < 4:
+        print("You have to specify host, port and name")
 
     host = sys.argv[1]
     port = int(sys.argv[2])
+    name = sys.argv[3]
+
+    addr = host + ":" + str(port)
+    cs = ChunkServer(name,  addr, "http://localhost:8888")
+    cs.start()
 
     server = SimpleXMLRPCServer((host, port))
     server.register_introspection_functions()
-    server.register_instance(ChunkServer("http://localhost:8888"))
+    server.register_instance(cs)
     server.serve_forever()

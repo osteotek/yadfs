@@ -1,6 +1,7 @@
 import sys
 import yaml
 import os
+from datetime import datetime
 from xmlrpc.server import SimpleXMLRPCServer
 from ns.file_node import FileNode
 from enums import NodeType, Status
@@ -11,6 +12,8 @@ class NameServer:
         self.root = FileNode('root', NodeType.directory)
         self.dump_on = dump_on
         self.dump_path = "name_server.yml"
+        self.cs_timeout = 3  # chunk server timeout in seconds
+        self.cs = {}  # chunk servers which should be detected by heartbeat
 
     # start name server
     # init heartbeat threads
@@ -148,6 +151,16 @@ class NameServer:
 
         return {'status': Status.ok, 'size': i.size}
 
+    # get heartbeat from chunk server
+    def heartbeat(self, name, addr):
+        if name not in self.cs:
+            print('register CS (name:' + name + ', address:' + addr + ')')
+            self.cs[name] = {'addr': addr, 'last_hb': datetime.now()}
+        else:
+            self.cs[name]['addr'] = addr
+            self.cs['last_hb'] = datetime.now()
+
+        return {'status': Status.ok}
 
 # args: host and port: localhost 888
 if __name__ == '__main__':
@@ -160,7 +173,7 @@ if __name__ == '__main__':
     ns = NameServer(dump_on=True)
     ns.start()
 
-    server = SimpleXMLRPCServer((host, port))
+    server = SimpleXMLRPCServer((host, port), logRequests=False)
     server.register_introspection_functions()
     server.register_instance(ns)
     server.serve_forever()
