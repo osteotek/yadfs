@@ -43,7 +43,7 @@ class NameServer:
     # if ok return { 'status': Status.ok, 'addr': cs_address }
     def get_cs(self, path):
         if self.root.find_path(path) is not None:
-            return 'file already exists'
+            return {'status': Status.already_exists}
 
         now = datetime.now()
         live = []
