@@ -84,6 +84,14 @@ class NameServer:
         items = ({'name': f.name, 'type': f.type} for f in directory.children)
         return {'status': Status.ok, 'items': list(items)}
 
+    # return size of the file
+    def size_of(self, path):
+        i = self.root.find_path(path)
+        if i is None:
+            return {'status': Status.not_found}
+
+        return {'status': Status.ok, 'size': i.size}
+
 # ars: host and port: localhost 888
 if __name__ == '__main__':
     if len(sys.argv) < 3:

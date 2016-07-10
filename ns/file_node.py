@@ -9,7 +9,7 @@ class FileNode:
         self.parent = None
         self.children = []
         self.type = node_type
-        self.size = 0  # size in bytes
+        self._size = 0  # size in bytes
 
         # dictionary of file chunks, empty for the directory
         self.chunks = {}
@@ -17,6 +17,17 @@ class FileNode:
     @property
     def is_root(self):
         return self.parent is None
+
+    @property
+    def size(self):
+        if self.type == NodeType.directory:
+            return sum(c.size for c in self.children)
+
+        return self._size
+
+    @size.setter
+    def size(self, value):
+        self._size = value
 
     def add_child(self, child):
         self.children.append(child)

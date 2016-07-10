@@ -50,6 +50,23 @@ class NSTests(unittest.TestCase):
         r = self.ns.get_file_info('/my/dir/file/my_dir')
         self.assertEquals(Status.not_found, r['status'])
 
+    def test_size_of(self):
+        self.ns.create_file({'path': '/my/file', 'size': 100, 'chunks': {}})
+        self.ns.create_file({'path': '/my/file2', 'size': 150, 'chunks': {}})
+
+        self.ns.create_file({'path': '/my/dir/file3', 'size': 200, 'chunks': {}})
+        self.ns.create_file({'path': '/my/dir/subdir/file5', 'size': 250, 'chunks': {}})
+
+        r = self.ns.size_of('/my')
+        self.assertEquals(Status.ok, r['status'])
+        self.assertEquals(100+150+200+250, r['size'])
+
+    def test_size_of_not_found(self):
+        self.ns.create_file({'path': '/my/dir/file3', 'size': 200, 'chunks': {}})
+        self.ns.create_file({'path': '/my/dir/subdir/file5', 'size': 250, 'chunks': {}})
+
+        r = self.ns.size_of('/my/some/path')
+        self.assertEquals(Status.not_found, r['status'])
 
 if __name__ == '__main__':
     unittest.main()
