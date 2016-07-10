@@ -34,25 +34,25 @@ class NSTests(unittest.TestCase):
 
     def test_make_directory(self):
         r = self.ns.make_directory('/my/dir/')
-        self.assertEquals(Status.ok, r['status'])
+        self.assertEqual(Status.ok, r['status'])
 
         r = self.ns.make_directory('/my/dir/and/new/dir')
-        self.assertEquals(Status.ok, r['status'])
+        self.assertEqual(Status.ok, r['status'])
 
         d = self.ns.get_file_info('/my/dir/and/new/dir')
-        self.assertEquals(NodeType.directory, d['type'])
+        self.assertEqual(NodeType.directory, d['type'])
 
     def test_make_directory_with_error(self):
         self.ns.create_file({'path': '/my/dir/file', 'size': 0, 'chunks': {}})
         r = self.ns.make_directory('/my/dir/file/my_dir')
-        self.assertEquals(Status.error, r['status'])
+        self.assertEqual(Status.error, r['status'])
         r = self.ns.get_file_info('/my/dir/file/my_dir')
-        self.assertEquals(Status.not_found, r['status'])
+        self.assertEqual(Status.not_found, r['status'])
 
     def test_make_directory_already_exists(self):
         self.ns.make_directory('/my/dir/file')
         r = self.ns.make_directory('/my/dir/file')
-        self.assertEquals(Status.already_exists, r['status'])
+        self.assertEqual(Status.already_exists, r['status'])
 
     def test_size_of(self):
         self.ns.create_file({'path': '/my/file', 'size': 100, 'chunks': {}})
@@ -62,28 +62,28 @@ class NSTests(unittest.TestCase):
         self.ns.create_file({'path': '/my/dir/subdir/file5', 'size': 250, 'chunks': {}})
 
         r = self.ns.size_of('/my')
-        self.assertEquals(Status.ok, r['status'])
-        self.assertEquals(100+150+200+250, r['size'])
+        self.assertEqual(Status.ok, r['status'])
+        self.assertEqual(100+150+200+250, r['size'])
 
     def test_size_of_not_found(self):
         self.ns.create_file({'path': '/my/dir/file3', 'size': 200, 'chunks': {}})
         self.ns.create_file({'path': '/my/dir/subdir/file5', 'size': 250, 'chunks': {}})
 
         r = self.ns.size_of('/my/some/path')
-        self.assertEquals(Status.not_found, r['status'])
+        self.assertEqual(Status.not_found, r['status'])
 
     def test_create_file_exists(self):
         self.ns.create_file({'path': '/my/dir/file3', 'size': 200, 'chunks': {}})
         r = self.ns.create_file({'path': '/my/dir/file3', 'size': 250, 'chunks': {}})
 
-        self.assertEquals(Status.already_exists, r['status'])
+        self.assertEqual(Status.already_exists, r['status'])
 
     def test_delete_file(self):
         self.ns.create_file({'path': '/my/dir/file3', 'size': 200, 'chunks': {}})
         self.ns.delete('/my/dir/file3')
 
         r = self.ns.get_file_info('/my/dir/file3')
-        self.assertEquals(Status.not_found, r['status'])
+        self.assertEqual(Status.not_found, r['status'])
 
     def test_dump(self):
         self.ns.create_file({'path': '/my/dir/file3', 'size': 200, 'chunks': {}})
@@ -94,13 +94,13 @@ class NSTests(unittest.TestCase):
         self.ns._load_dump()
 
         r = self.ns.get_file_info('/my/dir/another')
-        self.assertEquals(Status.ok, r['status'])
+        self.assertEqual(Status.ok, r['status'])
 
     def test_get_cs(self):
         self.ns.heartbeat("cs-22", "localhost:9999")
 
         r = self.ns.get_cs('/var/something')
-        self.assertEquals('localhost:9999', r['addr'])
+        self.assertEqual('localhost:9999', r['addr'])
 
 if __name__ == '__main__':
     unittest.main()
