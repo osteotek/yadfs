@@ -33,6 +33,23 @@ class NSTests(unittest.TestCase):
         self.assertEquals(Status.ok, r['status'])
         self.assertListEqual(items, r['items'])
 
+    def test_make_directory(self):
+        r = self.ns.make_directory('/my/dir/')
+        self.assertEquals(Status.ok, r['status'])
+
+        r = self.ns.make_directory('/my/dir/and/new/dir')
+        self.assertEquals(Status.ok, r['status'])
+
+        d = self.ns.get_file_info('/my/dir/and/new/dir')
+        self.assertEquals(NodeType.directory, d['type'])
+
+    def test_make_directory_with_error(self):
+        self.ns.create_file({'path': '/my/dir/file', 'size': 0, 'chunks': {}})
+        r = self.ns.make_directory('/my/dir/file/my_dir')
+        self.assertEquals(Status.error, r['status'])
+        r = self.ns.get_file_info('/my/dir/file/my_dir')
+        self.assertEquals(Status.not_found, r['status'])
+
 
 if __name__ == '__main__':
     unittest.main()

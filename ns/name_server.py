@@ -35,10 +35,11 @@ class NameServer:
     def delete_file(self, path):
         return {'status': Status.ok}
 
-    # get file info by given file path
+    # get file\directory info by given path
     # path format: /my_dir/index/some.file
     # response format:
     # { 'status': Status.ok
+    #   'type': NodeType.type
     #   'path': '/my_dir/index/some.file' - full path for directory
     #   'size': 2014 - size in bytes
     #   'chunks': { cs - name of chunk server, path - path to the chunk
@@ -55,6 +56,7 @@ class NameServer:
             chunks[c_name] = {'cs': val[0], 'path': file.get_full_dir_path() + '/' + c_name}
 
         return {'status': Status.ok,
+                'type': file.type,
                 'path': file.get_full_path(),
                 'size': file.size,
                 'chunks': chunks}
