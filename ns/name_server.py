@@ -9,6 +9,9 @@ from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.client import ServerProxy
 
 from os.path import dirname
+
+from ns.replicator import Replicator
+
 sys.path.append(dirname(dirname(__file__)))
 from utils.enums import NodeType, Status
 from ns.file_node import FileNode
@@ -21,6 +24,7 @@ class NameServer:
         self.dump_path = "name_server.yml"
         self.cs_timeout = 2  # chunk server timeout in seconds
         self.cs = {}  # chunk servers which should be detected by heartbeat
+        self.repl = Replicator(self)
 
     # start name server
     # init heartbeat threads
@@ -53,16 +57,18 @@ class NameServer:
 
         cs = self._select_available_cs()
         if cs is None:
+            print("available cs not found")
             return {'status': Status.not_found}
 
         return {'status': Status.ok, 'cs': cs}
 
     def _select_available_cs(self, ignore_cs=None):
-        now = datetime.now()
+        if ignore_cs is None:
+            ignore_cs = []
+
         live = []
-        for cs_name, last_hb in self.cs.items():
-            diff = (now - last_hb).total_seconds()
-            if diff <= self.cs_timeout and cs_name != ignore_cs:
+        for cs_name in self.cs:
+            if self._is_alive_cs(cs_name) and cs_name not in ignore_cs:
                 live.append(cs_name)
 
         if len(live) == 0:
@@ -70,6 +76,15 @@ class NameServer:
 
         i = random.randint(0, len(live) - 1)
         return live[i]
+
+    def _is_alive_cs(self, cs_addr):
+        if cs_addr not in self.cs:
+            return False
+
+        last_hb = self.cs[cs_addr]
+        now = datetime.now()
+        diff = (now - last_hb).total_seconds()
+        return diff <= self.cs_timeout
 
     # create file in NS after its chunks were created in CS
     # data.path = full path to the file
@@ -90,9 +105,12 @@ class NameServer:
         file.size = data['size']
         for k, v in data['chunks'].items():
             file.chunks[k] = [v]
+            # self.repl.put_in_queue(k, [v])
+            # self.repl.replicate()
 
         self._dump()
         print("Created file " + data['path'] + ' of size ' + str(data['size']))
+
         return {'status': Status.ok}
 
     # delete file\directory by specified path
@@ -205,8 +223,9 @@ class NameServer:
         self.cs[cs_addr] = datetime.now()
         return {'status': Status.ok}
 
-    # def replicate(self, file):
-    #     for c_path, cs in file.chunks.items:
+        # def replicate(self, file):
+        #     for c_path, cs in file.chunks.items:
+
 
 # args: host and port: localhost 888
 if __name__ == '__main__':

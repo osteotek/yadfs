@@ -65,9 +65,15 @@ class ChunkServer:
             return {'status': Status.not_found}
 
     def replicate_chunk(self, chunk_path, cs_addr):
-        cs = ServerProxy(cs_addr)
-        chunk = self.get_chunk(chunk_path)
-        cs.upload_chunk(chunk_path, chunk)
+        try:
+            cs = ServerProxy(cs_addr)
+            print("Replicate", chunk_path, 'to', cs_addr)
+            chunk = self.get_chunk(chunk_path)
+            cs.upload_chunk(chunk_path, chunk)
+            print("File", chunk_path, "has replicated to", cs_addr)
+            return "ok"
+        except:
+            print("Replication of", chunk_path, 'failed')
 
     def chunk_filename(self, chunk_path):
         return os.path.join(self.local_fs_root, chunk_path)
@@ -91,7 +97,7 @@ if __name__ == '__main__':
     name = sys.argv[3]
 
     addr = host + ":" + str(port)
-    cs = ChunkServer(name,  addr, "http://localhost:8889")
+    cs = ChunkServer(name,  addr, "http://localhost:8888")
     cs.start()
 
     server = SimpleXMLRPCServer((host, port))
