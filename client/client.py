@@ -108,14 +108,3 @@ class Client:
     def delete(self):
         for cs in self.chunk_servers:
             cs.delete_chunk("/folder/chunk1")
-
-
-# # first arg - NS address - http://localhost:888
-# if __name__ == '__main__':
-#     cl = Client(sys.argv[1])
-#
-    # cl.start()
-    # cl.add_chunk_server("http://localhost:9999")
-    # cl.write()
-    # cl.read()
-    # cl.delete()
