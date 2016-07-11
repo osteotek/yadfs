@@ -23,7 +23,6 @@ class Client:
         ls = self.ns.list_directory(dir_path)
         return ls
 
-
     def create_dir(self, path):
         res = self.ns.make_directory(path)
         return res

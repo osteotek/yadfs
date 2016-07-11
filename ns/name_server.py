@@ -181,7 +181,8 @@ class NameServer:
 
         items = {}
         for f in directory.children:
-            items[f.name] = f.type
+            # items[f.name] = f.type
+            items[f.name] = self.get_file_info(f.get_full_path())
 
         result = {'status': Status.ok, 'items': items}
         return result

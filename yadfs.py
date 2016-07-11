@@ -19,12 +19,11 @@ def ls(path):
     dir_ls = cl.list_dir(path)
     stat = dir_ls['status']
     if stat == Status.ok:
-        print(dir_ls['items'])
-        for item, t in dir_ls['items'].items():
+        for item, info in dir_ls['items'].items():
             fr = "-rw-r--r--"
-            if t == NodeType.directory:
+            if info['type'] == NodeType.directory:
                 fr = "drwxr-xr-x"
-            print('%11s   %s' % (fr, item))
+            print('%.11s   %.10s  %.10sB  %s' % (fr, getpass.getuser(), info['size'], item))
     else:
         print(Status.description(stat))
 
