@@ -1,14 +1,14 @@
+#!/usr/bin/env python3
 import os
 import random
 import sys
-from datetime import datetime
-from os.path import dirname
-
-from xmlrpc.server import SimpleXMLRPCServer
 import yaml
+from datetime import datetime
+from xmlrpc.server import SimpleXMLRPCServer
 
+from os.path import dirname
 sys.path.append(dirname(dirname(__file__)))
-from enums import NodeType, Status
+from utils.enums import NodeType, Status
 from ns.file_node import FileNode
 
 

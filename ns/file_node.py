@@ -1,4 +1,4 @@
-from enums import NodeType
+from utils.enums import NodeType
 
 
 class FileNode:

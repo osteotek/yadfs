@@ -1,5 +1,5 @@
 import unittest
-from enums import Status, NodeType
+from utils.enums import Status, NodeType
 from ns.name_server import NameServer
 
 

@@ -1,5 +1,6 @@
+#!/usr/bin/env python3
 import click
-from client import Client
+from client.client import Client
 
 # CLI
 @click.group(invoke_without_command=False)
@@ -58,7 +59,7 @@ def status(path):
 @cli.command()
 @click.argument('path')
 def download(path):
-    """Downlaod a file"""
+    """Download a file"""
     cl = Client()
     res = cl.download_file(path)
     print(res)
