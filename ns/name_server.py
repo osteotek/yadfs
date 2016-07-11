@@ -123,7 +123,6 @@ class NameServer:
                 except:
                     print('Failed to delete', f_path, 'from', cs)
 
-
     # get file\directory info by given path
     # path format: /my_dir/index/some.file
     # response format:
