@@ -3,8 +3,10 @@ import os
 import random
 import sys
 import yaml
+import _thread
 from datetime import datetime
 from xmlrpc.server import SimpleXMLRPCServer
+from xmlrpc.client import ServerProxy
 
 from os.path import dirname
 sys.path.append(dirname(dirname(__file__)))
@@ -107,11 +109,20 @@ class NameServer:
 
         item.delete()
         self._dump()
+        _thread.start_new_thread(self.delete_from_chunk_servers, (item,))
         return {'status': Status.ok}
 
-    def delete_from_chunk_server(self, file):
-        for path, servers in file.chunks.items:
-            pass
+    def delete_from_chunk_servers(self, file):
+        print('Start delete file', file.get_full_path())
+        for f_path, servers in file.chunks.items():
+            for cs in servers:
+                try:
+                    cl = ServerProxy(cs)
+                    print('Send delete', f_path, 'to', cs)
+                    cl.delete_chunk(f_path)
+                except:
+                    print('Failed to delete', f_path, 'from', cs)
+
 
     # get file\directory info by given path
     # path format: /my_dir/index/some.file

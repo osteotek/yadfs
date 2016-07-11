@@ -59,6 +59,7 @@ class ChunkServer:
         self.make_sure_path_exists(ldir)
         if os.path.exists(local_path):
             os.remove(local_path)
+            print('Delete file', chunk_path)
             return {'status': Status.ok}
         else:
             return {'status': Status.not_found}
