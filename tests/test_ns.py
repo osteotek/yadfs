@@ -114,10 +114,10 @@ class NSTests(unittest.TestCase):
         self.assertEqual(Status.ok, r['status'])
 
     def test_get_cs(self):
-        self.ns.heartbeat("cs-22", "localhost:9999")
+        self.ns.heartbeat("localhost:9999")
 
         r = self.ns.get_cs('/var/something')
-        self.assertEqual('localhost:9999', r['addr'])
+        self.assertEqual('localhost:9999', r['cs'])
 
 if __name__ == '__main__':
     unittest.main()

@@ -44,7 +44,7 @@ class NameServer:
     # get name where to put CS file
     # path in format like /my_dir/usr/new_file
     # returns { 'status': Status.not_found} if there are no available cs
-    # if ok return { 'status': Status.ok, 'addr': cs_address }
+    # if ok return { 'status': Status.ok, 'cs': cs_address }
     def get_cs(self, path):
         if self.root.find_path(path) is not None:
             return {'status': Status.already_exists}
@@ -53,15 +53,15 @@ class NameServer:
         if cs is None:
             return {'status': Status.not_found}
 
-        return {'status': Status.ok, 'addr': cs['addr'], 'name': cs['name']}
+        return {'status': Status.ok, 'cs': cs}
 
     def _select_available_cs(self, ignore_cs=None):
         now = datetime.now()
         live = []
-        for n, cs in self.cs.items():
-            diff = (now - cs['last_hb']).total_seconds()
-            if diff <= self.cs_timeout and n != ignore_cs:
-                live.append(cs)
+        for cs_name, last_hb in self.cs.items():
+            diff = (now - last_hb).total_seconds()
+            if diff <= self.cs_timeout and cs_name != ignore_cs:
+                live.append(cs_name)
 
         if len(live) == 0:
             return None
@@ -108,6 +108,10 @@ class NameServer:
         item.delete()
         self._dump()
         return {'status': Status.ok}
+
+    def delete_from_chunk_server(self, file):
+        for path, servers in file.chunks.items:
+            pass
 
     # get file\directory info by given path
     # path format: /my_dir/index/some.file
@@ -182,14 +186,11 @@ class NameServer:
         return {'status': Status.ok, 'size': i.size}
 
     # get heartbeat from chunk server
-    def heartbeat(self, name, addr):
-        if name not in self.cs:
-            print('register CS (name:' + name + ', address:' + addr + ')')
-            self.cs[name] = {'addr': addr, 'last_hb': datetime.now(), 'name': name}
-        else:
-            self.cs[name]['addr'] = addr
-            self.cs[name]['last_hb'] = datetime.now()
+    def heartbeat(self, cs_addr):
+        if cs_addr not in self.cs:
+            print('register CS ' + cs_addr)
 
+        self.cs[cs_addr] = datetime.now()
         return {'status': Status.ok}
 
     # def replicate(self, file):

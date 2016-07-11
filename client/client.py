@@ -32,9 +32,8 @@ class Client:
         return res
 
     def create_file(self, path):
-        cs = self._get_cs(path)
-        cs_addr = cs['addr']
-        cs_name = cs['name']
+        r = self._get_cs(path)
+        cs_addr = r['cs']
         cs = ServerProxy(cs_addr)
         chunks = self.split_file(path)
         data={}
@@ -43,7 +42,7 @@ class Client:
         data['chunks'] = {}
         for count, chunk in enumerate(chunks):
             cs.upload_chunk(path + '_{0}'.format(str(count)), chunk)
-            data['chunks'][path+'_'+str(count)] = cs_name
+            data['chunks'][path+'_'+str(count)] = cs_addr
 
         res = self.ns.create_file(data)
         return res
