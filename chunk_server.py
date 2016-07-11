@@ -1,6 +1,6 @@
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.client import ServerProxy
-from enum import Enum
+from enums import NodeType, Status
 import sys
 import os
 import errno
@@ -47,7 +47,7 @@ class ChunkServer:
         self.make_sure_path_exists(ldir)
         with open(local_path, "w") as f:
             f.write(chunk)
-            return "ok"
+            return {'status': Status.ok}
 
     def get_chunk(self, chunk_path):
         local_path = self.chunk_filename(chunk_path)
@@ -61,9 +61,9 @@ class ChunkServer:
         self.make_sure_path_exists(ldir)
         if os.path.exists(local_path):
             os.remove(local_path)
-            return "ok"
+            return {'status': Status.ok}
         else:
-            return "not_ok"
+            return {'status': Status.not_found}
 
     def replicate_chunk(self, chunk_path, cs_addr):
         cs = ServerProxy(cs_addr)
