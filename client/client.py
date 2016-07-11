@@ -49,7 +49,7 @@ class Client:
         return res
 
     def delete_file(self, path):
-        res = self.ns.delete_file(path)
+        res = self.ns.delete(path)
         return res
 
     def download_file(self, path):
@@ -71,10 +71,10 @@ class Client:
             data = fr.read()
         chunks = []
         while len(data) >= chunksize:
-            i = chunksize+1
+            i = chunksize
             while not data[i].isspace():
                 if i == 0:
-                    i = chunksize+1
+                    i = chunksize
                     break
                 else:
                     i -= 1
@@ -91,21 +91,3 @@ class Client:
         with open(filename, 'x') as fw:
             for chunk in chunks:
                 fw.write(chunk)
-
-    # for testing purposes
-    def add_chunk_server(self, cs_addr):
-        cs = ServerProxy(cs_addr)
-        self.chunk_servers.append(cs)
-
-    def write(self):
-        for cs in self.chunk_servers:
-            cs.upload_chunk("/folder/chunk1", "123")
-
-    def read(self):
-        for cs in self.chunk_servers:
-            f = cs.get_chunk("/folder/chunk1")
-            print(f)
-
-    def delete(self):
-        for cs in self.chunk_servers:
-            cs.delete_chunk("/folder/chunk1")
