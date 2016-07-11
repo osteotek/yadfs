@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import click
 from client.client import Client
-from utils.enums import Status
+from utils.enums import Status, NodeType
+import getpass
 
 # CLI
 @click.group(invoke_without_command=False)
@@ -9,17 +10,24 @@ from utils.enums import Status
 def cli(ctx):
     pass
 
+
 @cli.command()
 @click.argument('path', default="/")
 def ls(path):
     """List directory contents"""
     cl = Client()
     dir_ls = cl.list_dir(path)
-    stat = dir_ls['status'][0]
+    stat = dir_ls['status']
     if stat == Status.ok:
         print(dir_ls['items'])
+        for item, t in dir_ls['items'].items():
+            fr = "-rw-r--r--"
+            if t == NodeType.directory:
+                fr = "drwxr-xr-x"
+            print('%11s   %s' % (fr, item))
     else:
         print(Status.description(stat))
+
 
 @cli.command()
 @click.argument('path')
@@ -29,6 +37,7 @@ def mkdir(path):
     res = cl.create_dir(path)
     print(res)
 
+
 @cli.command()
 @click.argument('path')
 def rmdir(path):
@@ -36,6 +45,7 @@ def rmdir(path):
     cl = Client()
     res = cl.delete_dir(path)
     print(res)
+
 
 @cli.command()
 @click.argument('path')
@@ -45,6 +55,7 @@ def upload(path):
     res = cl.create_file(path)
     print(res)
 
+
 @cli.command()
 @click.argument('path')
 def rm(path):
@@ -53,6 +64,7 @@ def rm(path):
     res = cl.delete_file(path)
     print(res)
 
+
 @cli.command()
 @click.argument('path')
 def status(path):
@@ -60,6 +72,7 @@ def status(path):
     cl = Client()
     res = cl.path_status(path)
     print(res)
+
 
 @cli.command()
 @click.argument('path')
