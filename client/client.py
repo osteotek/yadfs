@@ -37,7 +37,7 @@ class Client:
         cs_name = cs['name']
         cs = ServerProxy(cs_addr)
         chunks = self.split_file(path)
-        data = {}
+        data={}
         data['path'] = path
         data['size'] = os.stat(path).st_size
         data['chunks'] = {}

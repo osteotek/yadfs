@@ -49,12 +49,9 @@ class NameServer:
         if self.root.find_path(path) is not None:
             return {'status': Status.already_exists}
 
-        live = self._select_available_cs()
-        if len(live) == 0:
+        cs = self._select_available_cs()
+        if cs is None:
             return {'status': Status.not_found}
-
-        i = random.randint(0, len(live) - 1)
-        cs = live[i]
 
         return {'status': Status.ok, 'addr': cs['addr'], 'name': cs['name']}
 
@@ -66,7 +63,11 @@ class NameServer:
             if diff <= self.cs_timeout and n != ignore_cs:
                 live.append(cs)
 
-        return live
+        if len(live) == 0:
+            return None
+
+        i = random.randint(0, len(live) - 1)
+        return live[i]
 
     # create file in NS after its chunks were created in CS
     # data.path = full path to the file
@@ -190,6 +191,9 @@ class NameServer:
             self.cs[name]['last_hb'] = datetime.now()
 
         return {'status': Status.ok}
+
+    # def replicate(self, file):
+    #     for c_path, cs in file.chunks.items:
 
 # args: host and port: localhost 888
 if __name__ == '__main__':
