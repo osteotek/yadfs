@@ -164,7 +164,8 @@ class NameServer:
         for f in directory.children:
             items[f.name] = f.type
 
-        return {'status': Status.ok, 'items': items}
+        result = {'status': Status.ok, 'items': items}
+        return result
 
     # return size of the file\directory by the given path
     # size of directory returns size of its children

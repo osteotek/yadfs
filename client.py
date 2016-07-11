@@ -17,7 +17,7 @@ class Client:
 
     def list_dir(self, dir_path):
         ls = self.ns.list_directory(dir_path)
-        return ls
+        return ls['items']
 
     def create_dir(self, path):
         res = self.ns.make_directory(path)

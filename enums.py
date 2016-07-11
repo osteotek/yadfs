@@ -1,12 +1,9 @@
-from enum import Enum
-
-
-class NodeType(Enum):
+class NodeType:
     file = 1
     directory = 2
 
 
-class Status(Enum):
+class Status:
     ok = 200,
     not_found = 404,
     error = 500,
