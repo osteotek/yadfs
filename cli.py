@@ -12,8 +12,8 @@ def cli(ctx):
 def ls(path):
     """List directory contents"""
     cl = Client()
-    list = cl.list_dir(path)
-    print(list)
+    dir_ls = cl.list_dir(path)
+    print(dir_ls)
 
 @cli.command()
 @click.argument('path')

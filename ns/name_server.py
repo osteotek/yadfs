@@ -1,11 +1,15 @@
-import sys
-import yaml
 import os
 import random
+import sys
 from datetime import datetime
+from os.path import dirname
+
 from xmlrpc.server import SimpleXMLRPCServer
-from ns.file_node import FileNode
+import yaml
+
+sys.path.append(dirname(dirname(__file__)))
 from enums import NodeType, Status
+from ns.file_node import FileNode
 
 
 class NameServer:
@@ -151,6 +155,7 @@ class NameServer:
     # }
     # if file not found: {'status': Status.not_found}
     def list_directory(self, path):
+        print('request to list directory ' + path)
         directory = self.root.find_path(path)
         if directory is None:
             return {'status': Status.not_found}

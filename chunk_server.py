@@ -80,13 +80,14 @@ class ChunkServer:
 if __name__ == '__main__':
     if len(sys.argv) < 4:
         print("You have to specify host, port and name")
+        exit()
 
     host = sys.argv[1]
     port = int(sys.argv[2])
     name = sys.argv[3]
 
     addr = host + ":" + str(port)
-    cs = ChunkServer(name,  addr, "http://localhost:8888")
+    cs = ChunkServer(name,  addr, "http://localhost:8889")
     cs.start()
 
     server = SimpleXMLRPCServer((host, port))

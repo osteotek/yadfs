@@ -7,7 +7,7 @@ class Client:
     def __init__(self):
         self.chunk_servers = []
         if not os.getenv('YAD_NS'):
-            os.environ["YAD_NS"] = "http://localhost:8888"
+            os.environ["YAD_NS"] = "http://localhost:8889"
         self.ns = ServerProxy(os.environ["YAD_NS"])
 
     def start(self):
