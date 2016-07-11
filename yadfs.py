@@ -37,7 +37,7 @@ def rmdir(path):
 def upload(path):
     """Create a file"""
     cl = Client()
-    res = cl.create_file(path, "")
+    res = cl.create_file(path)
     print(res)
 
 @cli.command()
