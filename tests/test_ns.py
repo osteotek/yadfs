@@ -24,7 +24,12 @@ class NSTests(unittest.TestCase):
 
         r = self.ns.list_directory('/var/some_dir')
 
-        items = {"file1": NodeType.file, 'file2': NodeType.file, 'usr': NodeType.directory}
+        for item, info in r['items'].items():
+            info.pop('date', None)
+
+        items = {"file1": {'path': '/var/some_dir/file1', 'type': NodeType.file, 'size': 1042, 'chunks': {'file1_01': 'cs-1'}, 'status': 200},
+                 'file2': {'path': '/var/some_dir/file2', 'type': NodeType.file, 'size': 2122, 'chunks': {'file2_01': 'cs-1'}, 'status': 200},
+                 'usr': {'path': '/var/some_dir/usr', 'type': NodeType.directory, 'size': 2122, 'chunks': {}, 'status': 200}}
 
         self.assertEqual(Status.ok, r['status'])
         self.assertDictEqual(items, r['items'])
@@ -36,7 +41,16 @@ class NSTests(unittest.TestCase):
 
         r = self.ns.list_directory('/')
 
+        for item, info in r['items'].items():
+            info.pop('date', None)
+
         items = {'some_dir': NodeType.directory, "my_dir": NodeType.directory, "another_file": NodeType.file}
+        items = {"some_dir": {'path': '/some_dir', 'type': NodeType.directory, 'size': 1042,
+                           'chunks': {}, 'status': 200},
+                 'my_dir': {'path': '/my_dir', 'type': NodeType.directory, 'size': 2122,
+                           'chunks': {}, 'status': 200},
+                 'another_file': {'path': '/another_file', 'type': NodeType.file, 'size': 2122, 'chunks': {'txt_01': 'cs-1'},
+                         'status': 200}}
 
         self.assertEqual(Status.ok, r['status'])
         self.assertDictEqual(items, r['items'])
