@@ -144,9 +144,10 @@ class NameServer:
             chunks[c_path] = val[0]
 
         return {'status': Status.ok,
-                'type': file.type,
-                'path': file.get_full_path(),
-                'size': file.size,
+                'type':   file.type,
+                'path':   file.get_full_path(),
+                'size':   file.size,
+                'date':   file.date,
                 'chunks': chunks}
 
     # creates directory by the given path

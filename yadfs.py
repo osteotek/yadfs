@@ -3,6 +3,8 @@ import click
 from client.client import Client
 from utils.enums import Status, NodeType
 import getpass
+import datetime
+
 
 # CLI
 @click.group(invoke_without_command=False)
@@ -23,7 +25,13 @@ def ls(path):
             fr = "-rw-r--r--"
             if info['type'] == NodeType.directory:
                 fr = "drwxr-xr-x"
-            print('%.11s   %.10s  %.10sB  %s' % (fr, getpass.getuser(), info['size'], item))
+            date = datetime.datetime.fromtimestamp(info['date'])
+            date_format = '%b %d %H:%M' if date.year == datetime.datetime.today().year else '%b %d %Y'
+            print('%.11s   %.10s   %.10sB   %.15s    %s' % (fr,
+                                                       getpass.getuser(),
+                                                       info['size'],
+                                                       datetime.datetime.fromtimestamp(info['date']).strftime(date_format),
+                                                       item))
     else:
         print(Status.description(stat))
 

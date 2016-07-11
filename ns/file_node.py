@@ -1,4 +1,5 @@
 from utils.enums import NodeType
+import time
 
 
 class FileNode:
@@ -8,6 +9,7 @@ class FileNode:
         self.children = []
         self.type = node_type
         self._size = 0  # size in bytes
+        self.date = time.time()
 
         # dictionary of file chunks, empty for the directory
         self.chunks = {}
