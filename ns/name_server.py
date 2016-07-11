@@ -62,7 +62,7 @@ class NameServer:
         i = random.randint(0, len(live) - 1)
         cs = live[i]
 
-        return {'status': Status.ok, 'addr': cs['addr']}
+        return {'status': Status.ok, 'addr': cs['addr'], 'name': cs['name']}
 
     # create file in NS after its chunks were created in CS
     # data.path = full path to the file
@@ -181,10 +181,10 @@ class NameServer:
     def heartbeat(self, name, addr):
         if name not in self.cs:
             print('register CS (name:' + name + ', address:' + addr + ')')
-            self.cs[name] = {'addr': addr, 'last_hb': datetime.now()}
+            self.cs[name] = {'addr': addr, 'last_hb': datetime.now(), 'name': name}
         else:
             self.cs[name]['addr'] = addr
-            self.cs['last_hb'] = datetime.now()
+            self.cs[name]['last_hb'] = datetime.now()
 
         return {'status': Status.ok}
 

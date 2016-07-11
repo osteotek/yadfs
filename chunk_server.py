@@ -30,7 +30,7 @@ class ChunkServer:
     def _heartbeat(self):
         while self.on:
             try:
-                self.ns.heartbeat(self.name, self.addr)
+                self.ns.heartbeat(self.name, 'http://' + self.addr)
             except:
                 pass  # ignore error during hb - send it in the next time
             time.sleep(self.hb_timeout)

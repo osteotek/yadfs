@@ -28,13 +28,20 @@ class Client:
         return res
 
     def create_file(self, path, content):
-        cs_addr = self._get_cs_addr(path)
+        cs = self._get_cs(path)
+        cs_addr = cs['addr']
+        cs_name = cs['name']
         cs = ServerProxy(cs_addr)
         chunks = self.split_file(path)
+        data = {}
+        data['path'] = path
+        data['size'] = os.stat(path).st_size
+        data['chunks'] = {}
         for count, chunk in enumerate(chunks):
             cs.upload_chunk(path + '_{0}'.format(str(count)), chunk)
+            data['chunks'][path+'_'+str(count)] = cs_name
 
-        res = self.ns.create_file(path, content)
+        res = self.ns.create_file(data)
         return res
 
     def delete_file(self, path):
@@ -47,9 +54,9 @@ class Client:
     def path_status(self, path):
         return "neither"
 
-    def _get_cs_addr(self, path):
+    def _get_cs(self, path):
         res = self.ns.get_cs(path)
-        return res['addr']
+        return res
 
     @staticmethod
     def split_file(filename, chunksize=1024):
