@@ -33,7 +33,7 @@ def rmdir(path):
 
 @cli.command()
 @click.argument('path')
-def touch(path):
+def upload(path):
     """Create a file"""
     cl = Client()
     res = cl.create_file(path, "")
@@ -53,6 +53,14 @@ def status(path):
     """Check if path refers to file or directory"""
     cl = Client()
     res = cl.path_status(path)
+    print(res)
+
+@cli.command()
+@click.argument('path')
+def download(path):
+    """Downlaod a file"""
+    cl = Client()
+    res = cl.download_file(path)
     print(res)
 
 if __name__ == '__main__':

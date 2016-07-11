@@ -28,7 +28,7 @@ class Client:
         return res
 
     def create_file(self, path, content):
-        cs_addr = self._get_cs(path)
+        cs_addr = self._get_cs_addr(path)
         cs = ServerProxy(cs_addr)
         chunks = self.split_file(path)
         for count, chunk in enumerate(chunks):
@@ -41,12 +41,15 @@ class Client:
         res = self.ns.delete_file(path)
         return res
 
+    def download_file(self, path):
+        pass
+
     def path_status(self, path):
         return "neither"
 
-    def _get_cs(self, path):
+    def _get_cs_addr(self, path):
         res = self.ns.get_cs(path)
-        return res
+        return res['addr']
 
     @staticmethod
     def split_file(filename, chunksize=1024):

@@ -8,11 +8,6 @@ import time
 import _thread
 
 
-class Result(Enum):
-    ok = 1
-    not_ok = 2
-
-
 class ChunkServer:
     def __init__(self, name, addr, ns_addr):
         self.ns = ServerProxy(ns_addr)
