@@ -49,13 +49,7 @@ class NameServer:
         if self.root.find_path(path) is not None:
             return {'status': Status.already_exists}
 
-        now = datetime.now()
-        live = []
-        for n, cs in self.cs.items():
-            diff = (now - cs['last_hb']).total_seconds()
-            if diff <= self.cs_timeout:
-                live.append(cs)
-
+        live = self._select_available_cs()
         if len(live) == 0:
             return {'status': Status.not_found}
 
@@ -63,6 +57,16 @@ class NameServer:
         cs = live[i]
 
         return {'status': Status.ok, 'addr': cs['addr'], 'name': cs['name']}
+
+    def _select_available_cs(self, ignore_cs=None):
+        now = datetime.now()
+        live = []
+        for n, cs in self.cs.items():
+            diff = (now - cs['last_hb']).total_seconds()
+            if diff <= self.cs_timeout and n != ignore_cs:
+                live.append(cs)
+
+        return live
 
     # create file in NS after its chunks were created in CS
     # data.path = full path to the file
@@ -111,9 +115,8 @@ class NameServer:
     #   'type': NodeType.type
     #   'path': '/my_dir/index/some.file' - full path for directory
     #   'size': 2014 - size in bytes
-    #   'chunks': { cs - name of chunk server, path - path to the chunk
-    #       'some.file_0': { 'cs': 'cs-2', 'path': '/my_dir/index/some.file_0'},
-    #       'some.file_1': { 'cs': 'cs-1', 'path': '/my_dir/index/some.file_1'}
+    #   'chunks': {
+    #       '/my_dir/index/some.file_0': cs-2
     #   }
     def get_file_info(self, path):
         file = self.root.find_path(path)
@@ -121,8 +124,8 @@ class NameServer:
             return {'status': Status.not_found}
 
         chunks = {}
-        for c_name, val in file.chunks.items():
-            chunks[c_name] = {'cs': val[0], 'path': file.get_full_dir_path() + '/' + c_name}
+        for c_path, val in file.chunks.items():
+            chunks[c_path] = val[0]
 
         return {'status': Status.ok,
                 'type': file.type,
