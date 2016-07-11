@@ -31,7 +31,7 @@ class Client:
         res = self.ns.delete_dir(path)
         return res
 
-    def create_file(self, path, content):
+    def create_file(self, path):
         cs = self._get_cs(path)
         cs_addr = cs['addr']
         cs_name = cs['name']

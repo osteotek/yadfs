@@ -85,7 +85,7 @@ class NameServer:
             file.chunks[k] = [v]
 
         self._dump()
-        print("Created file " + data['path'])
+        print("Created file " + data['path'] + ' of size ' + str(data['size']))
         return {'status': Status.ok}
 
     # delete file\directory by specified path
