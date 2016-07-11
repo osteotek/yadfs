@@ -1,6 +1,7 @@
 import os
 from xmlrpc.client import ServerProxy
 
+import sys
 from os.path import dirname
 sys.path.append(dirname(dirname(__file__)))
 from utils.enums import NodeType, Status
