@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from utils.enums import NodeType, Status
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.client import ServerProxy
 import sys
@@ -9,7 +10,6 @@ import _thread
 from os.path import dirname
 sys.path.append(dirname(dirname(__file__)))
 
-from utils.enums import NodeType, Status
 
 class ChunkServer:
     def __init__(self, name, addr, ns_addr):

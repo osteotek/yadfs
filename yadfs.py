@@ -1,4 +1,9 @@
+<<<<<<< 60037dd00464ce9323eca87970d5b67eda57ee74
 #!/usr/bin/env python3.5
+=======
+#!/usr/bin/env python3
+from utils.enums import Status
+>>>>>>> \"enum\" fix + check in ls for errors
 import click
 from client.client import Client
 
@@ -14,7 +19,11 @@ def ls(path):
     """List directory contents"""
     cl = Client()
     dir_ls = cl.list_dir(path)
-    print(dir_ls)
+    stat = dir_ls['status'][0]
+    if stat == Status.ok:
+        print(dir_ls['items'])
+    else:
+        print(Status.description(stat))
 
 @cli.command()
 @click.argument('path')

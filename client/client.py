@@ -11,7 +11,7 @@ class Client:
     def __init__(self):
         self.chunk_servers = []
         if not os.getenv('YAD_NS'):
-            os.environ["YAD_NS"] = "http://localhost:8889"
+            os.environ["YAD_NS"] = "http://localhost:8888"
         self.ns = ServerProxy(os.environ["YAD_NS"])
 
     def start(self):
@@ -21,7 +21,8 @@ class Client:
 
     def list_dir(self, dir_path):
         ls = self.ns.list_directory(dir_path)
-        return ls['items']
+        return ls
+
 
     def create_dir(self, path):
         res = self.ns.make_directory(path)
