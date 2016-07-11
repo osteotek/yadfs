@@ -1,11 +1,7 @@
-<<<<<<< 60037dd00464ce9323eca87970d5b67eda57ee74
-#!/usr/bin/env python3.5
-=======
 #!/usr/bin/env python3
-from utils.enums import Status
->>>>>>> \"enum\" fix + check in ls for errors
 import click
 from client.client import Client
+from utils.enums import Status
 
 # CLI
 @click.group(invoke_without_command=False)
