@@ -149,9 +149,9 @@ class NameServer:
     # execute ls command in directory
     # response:
     # { 'status': Status.ok,
-    #   'items': [ - list of items
-    #       {'name': item_name, 'type': NodeType},
-    #       {'name': item_name2, 'type': NodeType}]
+    #   'items': { - dict of items
+    #       item_name: NodeType.file,
+    #       item_name2: NodeType.directory }
     # }
     # if file not found: {'status': Status.not_found}
     def list_directory(self, path):
@@ -160,8 +160,11 @@ class NameServer:
         if directory is None:
             return {'status': Status.not_found}
 
-        items = ({'name': f.name, 'type': f.type} for f in directory.children)
-        return {'status': Status.ok, 'items': list(items)}
+        items = {}
+        for f in directory.children:
+            items[f.name] = f.type
+
+        return {'status': Status.ok, 'items': items}
 
     # return size of the file\directory by the given path
     # size of directory returns size of its children

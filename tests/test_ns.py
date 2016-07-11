@@ -25,12 +25,10 @@ class NSTests(unittest.TestCase):
 
         r = self.ns.list_directory('/var/some_dir')
 
-        items = [{'name': 'file1', 'type': NodeType.file},
-                 {'name': 'file2', 'type': NodeType.file},
-                 {'name': 'usr', 'type': NodeType.directory}]
+        items = {"file1": NodeType.file, 'file2': NodeType.file, 'usr': NodeType.directory}
 
         self.assertEqual(Status.ok, r['status'])
-        self.assertListEqual(items, r['items'])
+        self.assertDictEqual(items, r['items'])
 
     def test_root_list(self):
         self.ns.create_file({'path': '/some_dir/file1', 'size': 1042, 'chunks': {'file1_01': 'cs-1'}})
@@ -39,20 +37,18 @@ class NSTests(unittest.TestCase):
 
         r = self.ns.list_directory('/')
 
-        items = [{'name': 'some_dir', 'type': NodeType.directory},
-                 {'name': 'my_dir', 'type': NodeType.directory},
-                 {'name': 'another_file', 'type': NodeType.file}]
+        items = {'some_dir': NodeType.directory, "my_dir": NodeType.directory, "another_file": NodeType.file}
 
         self.assertEqual(Status.ok, r['status'])
-        self.assertListEqual(items, r['items'])
+        self.assertDictEqual(items, r['items'])
 
     def test_list_empty_root(self):
         r = self.ns.list_directory('/')
 
-        items = []
+        items = {}
 
         self.assertEqual(Status.ok, r['status'])
-        self.assertListEqual(items, r['items'])
+        self.assertDictEqual(items, r['items'])
 
     def test_make_directory(self):
         r = self.ns.make_directory('/my/dir/')
