@@ -32,6 +32,20 @@ class NSTests(unittest.TestCase):
         self.assertEqual(Status.ok, r['status'])
         self.assertListEqual(items, r['items'])
 
+    def test_root_list(self):
+        self.ns.create_file({'path': '/some_dir/file1', 'size': 1042, 'chunks': {'file1_01': 'cs-1'}})
+        self.ns.create_file({'path': '/my_dir/file2', 'size': 2122, 'chunks': {'file2_01': 'cs-1'}})
+        self.ns.create_file({'path': '/another_file', 'size': 2122, 'chunks': {'txt_01': 'cs-1'}})
+
+        r = self.ns.list_directory('/')
+
+        items = [{'name': 'some_dir', 'type': NodeType.directory},
+                 {'name': 'my_dir', 'type': NodeType.directory},
+                 {'name': 'another_file', 'type': NodeType.file}]
+
+        self.assertEqual(Status.ok, r['status'])
+        self.assertListEqual(items, r['items'])
+
     def test_list_empty_root(self):
         r = self.ns.list_directory('/')
 

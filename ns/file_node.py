@@ -74,7 +74,7 @@ class FileNode:
         # find child by the path
         if sep == -1:
             f_name = path
-            f_dir = path
+            f_dir = None
         else:
             # if path contains sub-folders than extract child name from the path and recursively look
             # in child sub-folders
@@ -106,10 +106,14 @@ class FileNode:
 
     def create_file(self, path):
         f_name, f_dir = self._extract_file_name_and_file_dir(path)
-        directory = self.create_dir(f_dir)
 
-        if directory == "Error":
-            return 'Error'
+        if f_dir is not None:
+            directory = self.create_dir(f_dir)
+
+            if directory == "Error":
+                return 'Error'
+        else:
+            directory = self
 
         file = FileNode(f_name, NodeType.file)
         directory.add_child(file)

@@ -14,7 +14,7 @@ from ns.file_node import FileNode
 
 class NameServer:
     def __init__(self, dump_on=True):
-        self.root = FileNode('root', NodeType.directory)
+        self.root = FileNode('/', NodeType.directory)
         self.dump_on = dump_on
         self.dump_path = "name_server.yml"
         self.cs_timeout = 2  # chunk server timeout in seconds
