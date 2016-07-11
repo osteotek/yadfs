@@ -32,6 +32,14 @@ class NSTests(unittest.TestCase):
         self.assertEqual(Status.ok, r['status'])
         self.assertListEqual(items, r['items'])
 
+    def test_list_empty_root(self):
+        r = self.ns.list_directory('/')
+
+        items = []
+
+        self.assertEqual(Status.ok, r['status'])
+        self.assertListEqual(items, r['items'])
+
     def test_make_directory(self):
         r = self.ns.make_directory('/my/dir/')
         self.assertEqual(Status.ok, r['status'])
