@@ -15,7 +15,6 @@ class ChunkServer:
     def __init__(self, addr, ns_addr):
         self.ns = ServerProxy(ns_addr)
         self.addr = addr
-        self.name = name
         self.ns_addr = ns_addr
         self.local_fs_root = "/tmp/yadfs/chunks"
         self.hb_timeout = 0.5  # heartbeat timeout in seconds
@@ -92,15 +91,19 @@ class ChunkServer:
 
 # ars: host and port: localhost 9999
 if __name__ == '__main__':
-    if len(sys.argv) < 3:
-        print("You have to specify host and port")
+    if len(sys.argv) < 2:
+        print("You have to specify address of chunk server")
         exit()
 
     host = sys.argv[1]
-    port = int(sys.argv[2])
+    port = 9999
 
     addr = host + ":" + str(port)
-    cs = ChunkServer(addr, "http://localhost:8888")
+    if not os.getenv('YAD_NS'):
+        ns_addr = 'http://localhost:8888'
+    else:
+        ns_addr = os.environ['YAD_NS']
+    cs = ChunkServer(addr, ns_addr)
     cs.start()
 
     server = SimpleXMLRPCServer((host, port))
