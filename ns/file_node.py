@@ -87,24 +87,24 @@ class FileNode:
     # recursively creates directory or directories from path
     # it returns error if already exists file with the same name as directory
     def create_dir(self, path):
-        ch_name, ch_path = self._extract_child_path_and_name(path)
+        dirs = path.strip('/').split('/')
+        curr_dir = self
+        i = 0
+        while i < len(dirs):
+            d_name = dirs[i]
 
-        # check if directory if already created
-        directory = next((x for x in self.children if x.name == ch_name), None)
-        if directory is None:
-            directory = FileNode(ch_name, NodeType.directory)
-            self.add_child(directory)
+            directory = next((x for x in curr_dir.children if x.name == d_name), None)
+            if directory is None:
+                directory = FileNode(d_name, NodeType.directory)
+                curr_dir.add_child(directory)
 
-        elif directory.type == NodeType.file:
-            print("Can't create directory because of wrong file name " + ch_name)
-            return "Error"
+            elif directory.type == NodeType.file:
+                print("Can't create directory because of wrong file name " + d_name)
+                return "Error"
+            curr_dir = directory
+            i += 1
 
-        # if path does not have any sub-folders
-        if ch_name == ch_path:
-            return directory
-
-        # create directories for sub-folders
-        return directory.create_dir(ch_path)
+        return curr_dir
 
     def create_file(self, path):
         f_name, f_dir = self._extract_file_name_and_file_dir(path)

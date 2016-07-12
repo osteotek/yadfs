@@ -73,6 +73,12 @@ class FileNodeTests(unittest.TestCase):
         f2 = self.root.find_path("/etc/nginx/file_dir1/file_dir2/my_file")
         self.assertEqual(f1, f2)
 
+    def test_create_file_dir_with_subs(self):
+        self.root.create_file("/q/q/LICENSE")
+
+        f = self.root.find_path("/q/q/LICENSE")
+        self.assertEqual("/q/q/LICENSE", f.get_full_path())
+
     def test_full_path(self):
         f = self.root.create_file("/etc/nginx/file_dir1/file_dir2/my_file")
         self.assertEqual("/etc/nginx/file_dir1/file_dir2/my_file", f.get_full_path())
