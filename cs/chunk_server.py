@@ -26,7 +26,7 @@ class ChunkServer:
             print('Create directory for storage:', self.local_fs_root,)
             os.makedirs(self.local_fs_root)
 
-        print('Start sending heartbeats')
+        print('Start sending heartbeats to', self.ns_addr)
         _thread.start_new_thread(self._heartbeat, ())
         print('Server is ready')
 
