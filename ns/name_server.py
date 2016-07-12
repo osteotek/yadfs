@@ -20,7 +20,7 @@ class NameServer:
     def __init__(self, dump_on=True):
         self.root = FileNode('/', NodeType.directory)
         self.dump_on = dump_on
-        self.dump_path = "/tmp/stor/name_server.yml"
+        self.dump_path = "name_server.yml"
         self.cs_timeout = 2  # chunk server timeout in seconds
         self.cs = {}  # chunk servers which should be detected by heartbeat
         self.repl = Replicator(self)
@@ -123,6 +123,7 @@ class NameServer:
     # Status.error if you try to delete root
     # Status.not_found if path not found
     def delete(self, path):
+        print("Delete", path)
         item = self.root.find_path(path)
         if item is None:
             return {'status': Status.not_found}
@@ -136,15 +137,19 @@ class NameServer:
         return {'status': Status.ok}
 
     def delete_from_chunk_servers(self, file):
-        print('Start delete file', file.get_full_path())
-        for f_path, servers in file.chunks.items():
-            for cs in servers:
-                try:
-                    cl = ServerProxy(cs)
-                    print('Send delete', f_path, 'to', cs)
-                    cl.delete_chunk(f_path)
-                except:
-                    print('Failed to delete', f_path, 'from', cs)
+        if file.type == NodeType.directory:
+            for c in list(file.children):
+                self.delete_from_chunk_servers(c)
+        else:
+            print('Start delete file', file.get_full_path())
+            for f_path, servers in file.chunks.items():
+                for cs in servers:
+                    try:
+                        cl = ServerProxy(cs)
+                        print('Send delete', f_path, 'to', cs)
+                        cl.delete_chunk(f_path)
+                    except:
+                        print('Failed to delete', f_path, 'from', cs)
 
     # get file\directory info by given path
     # path format: /my_dir/index/some.file
@@ -227,10 +232,6 @@ class NameServer:
 
         self.cs[cs_addr] = datetime.now()
         return {'status': Status.ok}
-
-        # def replicate(self, file):
-        #     for c_path, cs in file.chunks.items:
-
 
 # args: host and port: localhost 8888
 if __name__ == '__main__':
