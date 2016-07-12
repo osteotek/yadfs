@@ -42,7 +42,22 @@ class Client:
         return self.ns.delete(path)
 
     def download_file(self, path):
-        pass
+        info = self.ns.get_file_info(path)
+        chunks = info['chunks']
+        content = ""
+        data = {}
+        for chunk, addr in chunks.items():
+            cs = ServerProxy(addr)
+            chunk_data = cs.get_chunk(chunk)
+            index = int(chunk.split("_")[-1])
+            data[index] = chunk_data
+
+        i = 0
+        while i < len(data):
+            content += data[i]
+            i += 1
+
+        return content
 
     def path_status(self, path):
         return self.ns.get_file_info(path)

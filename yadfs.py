@@ -95,9 +95,19 @@ def download(path):
     """Download a file"""
     cl = Client()
     res = cl.download_file(path)
-    stat = res['status']
-    if stat != Status.ok:
-        print(Status.description(stat))
+    print(res)
+    # stat = res['status']
+    # if stat != Status.ok:
+    #     print(Status.description(stat))
+
+
+@cli.command()
+@click.argument('path')
+def cat(path):
+    """Print a file"""
+    cl = Client()
+    res = cl.download_file(path)
+    print(res)
 
 if __name__ == '__main__':
     cli()
