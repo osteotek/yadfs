@@ -21,7 +21,7 @@ class NameServer:
     def __init__(self, dump_on=True):
         self.root = FileNode('/', NodeType.directory)
         self.dump_on = dump_on
-        self.dump_path = "name_server.yml"
+        self.dump_path = "/tmp/stor/name_server.yml"
         self.cs_timeout = 2  # chunk server timeout in seconds
         self.cs = {}  # chunk servers which should be detected by heartbeat
         self.repl = Replicator(self)
@@ -45,6 +45,7 @@ class NameServer:
     # dump file-tree to file if self.dump_on is True
     def _dump(self):
         if self.dump_on:
+            os.makedirs(os.path.dirname(self.dump_path), exist_ok=True)
             with open(self.dump_path, 'w') as outfile:
                 outfile.write(yaml.dump(self.root))
 
@@ -108,6 +109,7 @@ class NameServer:
         file.size = data['size']
         for k, v in data['chunks'].items():
             file.chunks[k] = [v]
+            print('Chunk',k,'saved on', v)
 
         for c in file.chunks:
             self.repl.put_in_queue(c, file.chunks[c])  # put chunk to replication queue

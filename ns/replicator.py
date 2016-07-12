@@ -1,6 +1,9 @@
 from queue import Queue
 from xmlrpc.client import ServerProxy
 import _thread
+import time
+
+from utils.enums import NodeType
 
 
 class Replicator:
@@ -12,6 +15,7 @@ class Replicator:
     def start(self):
         print('Start replication workers')
         _thread.start_new_thread(self._replicate_worker, ())
+        _thread.start_new_thread(self.server_watcher, ())
 
     def put_in_queue(self, path, existing_cs):
         item = (path, existing_cs)
@@ -32,7 +36,7 @@ class Replicator:
         alive = [x for x in cs_list if self.ns._is_alive_cs(x)]
 
         if len(alive) == 0:
-            print('All CS are down :(')
+            print('There no live cs for chunk', path)
             return
 
         if len(alive) >= 2:
@@ -53,5 +57,31 @@ class Replicator:
                     file.chunks[path].append(new_cs)
                 else:
                     print("Cant find file for chunk", path, "after replication")
-            except:
-                print('Error during replicatiion', path, 'to', new_cs)
+            except Exception as e:
+                print('Error during replicatiion', path, 'to', new_cs, ':', e)
+
+    # server watcher monitor heartbeats
+    # and start emergency replication if needed
+    def server_watcher(self):
+        while self.on:
+            for cs_name in list(self.ns.cs):
+                if not self.ns._is_alive_cs(cs_name):
+                    print('CS', cs_name, 'detected as not alive')
+                    self.ns.cs.pop(cs_name)
+                    _thread.start_new_thread(self.emergency_replication, ())
+        time.sleep(1)
+
+    def emergency_replication(self):
+        print('Start emergency replication for files from')
+        self.traverse_replication(self.ns.root)
+
+    def traverse_replication(self, item):
+        if item.type == NodeType.file:
+            for c in list(item.chunks):
+                alive = [x for x in item.chunks[c] if self.ns._is_alive_cs(c)]
+                if len(alive) < 2:
+                    print('Chunk', c, 'put to replication')
+                    self.put_in_queue(c, item.chunks[c])
+        else:
+            for c in item.children:
+                self.traverse_replication(c)
