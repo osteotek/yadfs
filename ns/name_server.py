@@ -20,7 +20,7 @@ class NameServer:
     def __init__(self, dump_on=True):
         self.root = FileNode('/', NodeType.directory)
         self.dump_on = dump_on
-        self.dump_path = "name_server.yml"
+        self.dump_path = "./name_server.yml"
         self.cs_timeout = 2  # chunk server timeout in seconds
         self.cs = {}  # chunk servers which should be detected by heartbeat
         self.repl = Replicator(self)
@@ -44,8 +44,11 @@ class NameServer:
     # dump file-tree to file if self.dump_on is True
     def _dump(self):
         if self.dump_on:
-            with open(self.dump_path, 'w') as outfile:
-                outfile.write(yaml.dump(self.root))
+            try:
+                with open(self.dump_path, 'w') as outfile:
+                    outfile.write(yaml.dump(self.root))
+            except Exception as e:
+                print("Error dumping file", self.dump_path, e)
 
     # get name where to put CS file
     # path in format like /my_dir/usr/new_file
