@@ -42,7 +42,9 @@ def mkdir(path):
     """Create a directory"""
     cl = Client()
     res = cl.create_dir(path)
-    print(res)
+    stat = res['status']
+    if stat != Status.ok:
+        print(Status.description(stat))
 
 
 @cli.command()
@@ -51,7 +53,9 @@ def rmdir(path):
     """Remove a directory"""
     cl = Client()
     res = cl.delete_dir(path)
-    print(res)
+    stat = res['status']
+    if stat != Status.ok:
+        print(Status.description(stat))
 
 
 @cli.command()
@@ -60,7 +64,9 @@ def upload(path):
     """Create a file"""
     cl = Client()
     res = cl.create_file(path)
-    print(res)
+    stat = res['status']
+    if stat != Status.ok:
+        print(Status.description(stat))
 
 
 @cli.command()
@@ -69,7 +75,9 @@ def rm(path):
     """Delete a file"""
     cl = Client()
     res = cl.delete_file(path)
-    print(res)
+    stat = res['status']
+    if stat != Status.ok:
+        print(Status.description(stat))
 
 
 @cli.command()
@@ -78,7 +86,7 @@ def status(path):
     """Check if path refers to file or directory"""
     cl = Client()
     res = cl.path_status(path)
-    print(res)
+    print('%s is a %s' % (path, NodeType.description(res['type'])))
 
 
 @cli.command()
@@ -87,7 +95,9 @@ def download(path):
     """Download a file"""
     cl = Client()
     res = cl.download_file(path)
-    print(res)
+    stat = res['status']
+    if stat != Status.ok:
+        print(Status.description(stat))
 
 if __name__ == '__main__':
     cli()

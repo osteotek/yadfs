@@ -55,7 +55,7 @@ class Client:
         pass
 
     def path_status(self, path):
-        return "neither"
+        return self.ns.get_file_info(path)
 
     def _get_cs(self, path):
         res = self.ns.get_cs(path)

@@ -133,5 +133,15 @@ class NSTests(unittest.TestCase):
         r = self.ns.get_cs('/var/something')
         self.assertEqual('localhost:9999', r['cs'])
 
+    def test_check_status(self):
+        self.ns.make_directory('/my/dir/file')
+        self.ns.create_file({'path': '/some_dir/file1', 'size': 1042, 'chunks': {'file1_01': 'cs-1'}})
+
+        fs = self.ns.get_file_info('/some_dir/file1')
+        ds = self.ns.get_file_info('/my/dir/file')
+
+        self.assertEqual(NodeType.file, fs['type'])
+        self.assertEqual(NodeType.directory, ds['type'])
+
 if __name__ == '__main__':
     unittest.main()

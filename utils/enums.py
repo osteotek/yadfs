@@ -2,6 +2,13 @@ class NodeType:
     file = 1
     directory = 2
 
+    @staticmethod
+    def description(stat):
+        if stat == NodeType.file:
+            return "file"
+        else:
+            return "directory"
+
 
 class Status:
     ok = 200
