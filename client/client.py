@@ -14,22 +14,14 @@ class Client:
             os.environ["YAD_NS"] = "http://localhost:8888"
         self.ns = ServerProxy(os.environ["YAD_NS"])
 
-    def start(self):
-        print('send test request to ns')
-        r = self.ns.list_directory('/')
-        print(r)
-
     def list_dir(self, dir_path):
-        ls = self.ns.list_directory(dir_path)
-        return ls
+        return self.ns.list_directory(dir_path)
 
     def create_dir(self, path):
-        res = self.ns.make_directory(path)
-        return res
+        return self.ns.make_directory(path)
 
     def delete_dir(self, path):
-        res = self.ns.delete_dir(path)
-        return res
+        return self.ns.delete_dir(path)
 
     def create_file(self, path):
         r = self._get_cs(path)
@@ -44,12 +36,10 @@ class Client:
             cs.upload_chunk(path + '_{0}'.format(str(count)), chunk)
             data['chunks'][path+'_'+str(count)] = cs_addr
 
-        res = self.ns.create_file(data)
-        return res
+        return self.ns.create_file(data)
 
     def delete_file(self, path):
-        res = self.ns.delete(path)
-        return res
+        return self.ns.delete(path)
 
     def download_file(self, path):
         pass
@@ -58,8 +48,7 @@ class Client:
         return self.ns.get_file_info(path)
 
     def _get_cs(self, path):
-        res = self.ns.get_cs(path)
-        return res
+        return self.ns.get_cs(path)
 
     @staticmethod
     def split_file(filename, chunksize=1024):

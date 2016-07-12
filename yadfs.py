@@ -27,7 +27,7 @@ def ls(path):
                 fr = "drwxr-xr-x"
             date = datetime.datetime.fromtimestamp(info['date'])
             date_format = '%b %d %H:%M' if date.year == datetime.datetime.today().year else '%b %d %Y'
-            print('%.11s   %.10s   %.10sB   %.15s    %s' % (fr,
+            print('%.11s   %.10s   %6sB   %.15s    %s' % (fr,
                                                        getpass.getuser(),
                                                        info['size'],
                                                        datetime.datetime.fromtimestamp(info['date']).strftime(date_format),

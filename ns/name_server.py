@@ -187,8 +187,8 @@ class NameServer:
     # response:
     # { 'status': Status.ok,
     #   'items': { - dict of items
-    #       item_name: NodeType.file,
-    #       item_name2: NodeType.directory }
+    #       item_name: dict from get_file_info()
+    #       item_name2: dict from get_file_info() }
     # }
     # if file not found: {'status': Status.not_found}
     def list_directory(self, path):
