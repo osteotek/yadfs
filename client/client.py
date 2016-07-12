@@ -28,6 +28,8 @@ class Client:
         fn = path.split("/")[-1]
         remote_filepath = os.path.join(remote_path, fn)
         r = self._get_cs(remote_filepath)
+        if not r['status'] == Status.ok:
+            return r
         cs_addr = r['cs']
         cs = ServerProxy(cs_addr)
         chunks = self.split_file(path)
