@@ -40,6 +40,7 @@ class ChunkServer:
             time.sleep(self.hb_timeout)
 
     def upload_chunk(self, chunk_path, chunk):
+        print('Upload file', chunk_path)
         local_path = self.chunk_filename(chunk_path)
         ldir = os.path.dirname(local_path)
         self.make_sure_path_exists(ldir)

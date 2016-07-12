@@ -1,4 +1,4 @@
-from utils.enums import NodeType
+from utils.enums import NodeType, Status
 import time
 
 
@@ -120,6 +120,16 @@ class FileNode:
         file = FileNode(f_name, NodeType.file)
         directory.add_child(file)
         return file
+
+    def find_file_by_chunk(self, path):
+
+        i = path.rfind('_')
+        if i is None:
+            print("Incorrect chunk path", path)
+            return Status.error
+
+        file_name = path[:i]
+        return self.find_path(file_name)
 
     # delete node from the file tree
     # you can't delete root!

@@ -91,5 +91,12 @@ class FileNodeTests(unittest.TestCase):
         f = self.root.create_dir("/etc/nginx/another/f1/f2/f3")
         self.assertEqual("/etc/nginx/another/f1/f2/f3", f.get_full_dir_path())
 
+    def test_find_file_by_chunk(self):
+        f1 = self.root.create_file("/etc/nginx/file")
+        f1.chunks['/etc/nginx/file_01'] = "http://localhost:7777"
+
+        f = self.root.find_file_by_chunk("/etc/nginx/file_0")
+        self.assertEqual(f1, f)
+
 if __name__ == '__main__':
     unittest.main()

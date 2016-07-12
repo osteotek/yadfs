@@ -40,14 +40,18 @@ class Replicator:
             return
 
         new_cs = self.ns._select_available_cs(alive)
-
         if new_cs is None:
             print("Can't find available cs for replication", path)
         else:
             try:
                 cl = ServerProxy(alive[0])
                 cl.replicate_chunk(path, new_cs)
-                cs_list.append(new_cs)
                 print("File", path, "replicated to", new_cs)
+
+                file = self.ns.root.find_file_by_chunk(path)
+                if file is not None and path in file.chunks:
+                    file.chunks[path].append(new_cs)
+                else:
+                    print("Cant find file for chunk", path, "after replication")
             except:
                 print('Error during replicatiion', path, 'to', new_cs)
