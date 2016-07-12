@@ -130,13 +130,9 @@ class NameServer:
         if item.is_root:
             return {'status': Status.error}
 
-        print('item delete 1')
         item.delete()
-        print('item delete 2')
         self._dump()
-        print('dunp')
         _thread.start_new_thread(self.delete_from_chunk_servers, (item,))
-        print('chunks')
         return {'status': Status.ok}
 
     def delete_from_chunk_servers(self, file):
