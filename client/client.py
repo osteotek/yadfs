@@ -1,4 +1,5 @@
 import os
+import errno
 from xmlrpc.client import ServerProxy
 
 import sys
@@ -23,25 +24,36 @@ class Client:
     def delete_dir(self, path):
         return self.ns.delete_dir(path)
 
-    def create_file(self, path):
-        r = self._get_cs(path)
+    def create_file(self, path, remote_path):
+        fn = path.split("/")[-1]
+        remote_filepath = os.path.join(remote_path, fn)
+        r = self._get_cs(remote_filepath)
         cs_addr = r['cs']
         cs = ServerProxy(cs_addr)
         chunks = self.split_file(path)
         data={}
-        data['path'] = path
+        data['path'] = remote_filepath
         data['size'] = os.stat(path).st_size
         data['chunks'] = {}
         for count, chunk in enumerate(chunks):
-            cs.upload_chunk(path + '_{0}'.format(str(count)), chunk)
-            data['chunks'][path+'_'+str(count)] = cs_addr
+            cs.upload_chunk(remote_filepath + '_{0}'.format(str(count)), chunk)
+            data['chunks'][remote_filepath+'_'+str(count)] = cs_addr
 
         return self.ns.create_file(data)
 
     def delete_file(self, path):
         return self.ns.delete(path)
 
-    def download_file(self, path):
+    def download_file(self, path, dst_path):
+        content = self.get_file_content(path)
+        fn = path.split("/")[-1]
+        self.make_sure_path_exists(dst_path)
+        file_path = os.path.join(dst_path, fn)
+        with open(file_path, "w") as f:
+            f.write(content)
+            return {'status': Status.ok}
+
+    def get_file_content(self, path):
         info = self.ns.get_file_info(path)
         chunks = info['chunks']
         content = ""
@@ -94,3 +106,11 @@ class Client:
         with open(filename, 'x') as fw:
             for chunk in chunks:
                 fw.write(chunk)
+
+    @staticmethod
+    def make_sure_path_exists(path):
+        try:
+            os.makedirs(path)
+        except OSError as exception:
+            if exception.errno != errno.EEXIST:
+                raise

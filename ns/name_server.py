@@ -53,6 +53,7 @@ class NameServer:
     # if ok return { 'status': Status.ok, 'cs': cs_address }
     def get_cs(self, path):
         if self.root.find_path(path) is not None:
+            print(self.root.find_path(path))
             return {'status': Status.already_exists}
 
         cs = self._select_available_cs()
@@ -95,6 +96,7 @@ class NameServer:
     # Status.already_exists - file is already created
     def create_file(self, data):
         file = self.root.find_path(data['path'])
+        print(file)
         if file is not None:
             return {'status': Status.already_exists}
 

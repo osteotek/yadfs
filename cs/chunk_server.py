@@ -40,7 +40,6 @@ class ChunkServer:
 
     def upload_chunk(self, chunk_path, chunk):
         local_path = self.chunk_filename(chunk_path)
-        print(local_path)
         ldir = os.path.dirname(local_path)
         self.make_sure_path_exists(ldir)
         with open(local_path, "w") as f:
@@ -76,7 +75,10 @@ class ChunkServer:
             print("Replication of", chunk_path, 'failed')
 
     def chunk_filename(self, chunk_path):
-        return os.path.join(self.local_fs_root, chunk_path)
+        if chunk_path[0] == '/':
+            return os.path.join(self.local_fs_root, chunk_path[1:])
+        else:
+            return os.path.join(self.local_fs_root, chunk_path)
 
     @staticmethod
     def make_sure_path_exists(path):

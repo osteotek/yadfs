@@ -59,11 +59,12 @@ def rmdir(path):
 
 
 @cli.command()
-@click.argument('path')
-def upload(path):
+@click.argument('local_path')
+@click.argument('remote_path', default="/")
+def upload(local_path, remote_path):
     """Create a file"""
     cl = Client()
-    res = cl.create_file(path)
+    res = cl.create_file(local_path, remote_path)
     stat = res['status']
     if stat != Status.ok:
         print(Status.description(stat))
@@ -90,15 +91,16 @@ def status(path):
 
 
 @cli.command()
-@click.argument('path')
-def download(path):
+@click.argument('path_from')
+@click.argument('path_to')
+def download(path_from, path_to):
     """Download a file"""
     cl = Client()
-    res = cl.download_file(path)
-    print(res)
-    # stat = res['status']
-    # if stat != Status.ok:
-    #     print(Status.description(stat))
+    res = cl.download_file(path_from, path_to)
+    # print(res)
+    stat = res['status']
+    if stat != Status.ok:
+        print(Status.description(stat))
 
 
 @cli.command()
@@ -106,7 +108,7 @@ def download(path):
 def cat(path):
     """Print a file"""
     cl = Client()
-    res = cl.download_file(path)
+    res = cl.get_file_content(path)
     print(res)
 
 if __name__ == '__main__':
