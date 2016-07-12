@@ -10,9 +10,8 @@ from xmlrpc.client import ServerProxy
 
 from os.path import dirname
 
-from ns.replicator import Replicator
-
 sys.path.append(dirname(dirname(__file__)))
+from ns.replicator import Replicator
 from utils.enums import NodeType, Status
 from ns.file_node import FileNode
 
@@ -240,7 +239,7 @@ if __name__ == '__main__':
         port = int(sys.argv[2])
     else:
         host = 'localhost'
-        port = '8888'
+        port = 8888
 
     ns = NameServer(dump_on=True)
     ns.start()
