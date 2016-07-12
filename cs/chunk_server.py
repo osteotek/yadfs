@@ -12,7 +12,7 @@ from utils.enums import NodeType, Status
 
 
 class ChunkServer:
-    def __init__(self, name, addr, ns_addr):
+    def __init__(self, addr, ns_addr):
         self.ns = ServerProxy(ns_addr)
         self.addr = addr
         self.name = name
@@ -92,16 +92,15 @@ class ChunkServer:
 
 # ars: host and port: localhost 9999
 if __name__ == '__main__':
-    if len(sys.argv) < 4:
-        print("You have to specify host, port and name")
+    if len(sys.argv) < 3:
+        print("You have to specify host and port")
         exit()
 
     host = sys.argv[1]
     port = int(sys.argv[2])
-    name = sys.argv[3]
 
     addr = host + ":" + str(port)
-    cs = ChunkServer(name,  addr, "http://localhost:8888")
+    cs = ChunkServer(addr, "http://localhost:8888")
     cs.start()
 
     server = SimpleXMLRPCServer((host, port))
