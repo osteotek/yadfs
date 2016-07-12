@@ -30,6 +30,7 @@ class NameServer:
     # init heartbeat threads
     def start(self):
         self._load_dump()
+        #self.repl.start()
 
     def _load_dump(self):
         # try to read file from dump
@@ -107,8 +108,7 @@ class NameServer:
         file.size = data['size']
         for k, v in data['chunks'].items():
             file.chunks[k] = [v]
-            # self.repl.put_in_queue(k, [v])
-            # self.repl.replicate()
+            self.repl.put_in_queue(k, [v])  # put chunk to replication queue
 
         self._dump()
         print("Created file " + data['path'] + ' of size ' + str(data['size']))

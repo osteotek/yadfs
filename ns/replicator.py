@@ -1,21 +1,28 @@
 from queue import Queue
 from xmlrpc.client import ServerProxy
+import _thread
 
 
 class Replicator:
     def __init__(self, ns):
         self.ns = ns
         self.queue = Queue()
+        self.on = True
 
     def start(self):
-        pass
+        print('Start replication workers')
+        _thread.start_new_thread(self._replicate_worker, ())
 
     def put_in_queue(self, path, existing_cs):
         item = (path, existing_cs)
         self.queue.put(item)
 
-    def replicate(self):
-        item = self.queue.get()
+    def _replicate_worker(self):
+        while self.on:
+            item = self.queue.get()
+            self.replicate(item)
+
+    def replicate(self, item):
         if item is None:
             return
 

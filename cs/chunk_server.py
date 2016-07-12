@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from xmlrpc.server import SimpleXMLRPCServer
-from xmlrpc.client import ServerProxy
+from xmlrpc.client import ServerProxy, Error
 import sys
 import os
 import errno
@@ -16,6 +16,7 @@ class ChunkServer:
         self.ns = ServerProxy(ns_addr)
         self.addr = addr
         self.name = name
+        self.ns_addr = ns_addr
         self.local_fs_root = "/tmp/yadfs/chunks"
         self.hb_timeout = 0.5  # heartbeat timeout in seconds
         self.on = True
@@ -34,8 +35,8 @@ class ChunkServer:
         while self.on:
             try:
                 self.ns.heartbeat('http://' + self.addr)
-            except:
-                pass  # ignore error during hb - send it in the next time
+            except Exception as e:
+                pass
             time.sleep(self.hb_timeout)
 
     def upload_chunk(self, chunk_path, chunk):
