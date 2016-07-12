@@ -44,7 +44,6 @@ class NameServer:
     # dump file-tree to file if self.dump_on is True
     def _dump(self):
         if self.dump_on:
-            os.makedirs(os.path.dirname(self.dump_path), exist_ok=True)
             with open(self.dump_path, 'w') as outfile:
                 outfile.write(yaml.dump(self.root))
 

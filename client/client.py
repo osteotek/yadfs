@@ -43,7 +43,7 @@ class Client:
 
         return self.ns.create_file(data)
 
-    def delete_file(self, path):
+    def delete(self, path):
         return self.ns.delete(path)
 
     def download_file(self, path, dst_path):

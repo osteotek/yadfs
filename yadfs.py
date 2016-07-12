@@ -48,17 +48,6 @@ def mkdir(path):
 
 
 @cli.command()
-@click.argument('path')
-def rmdir(path):
-    """Remove a directory"""
-    cl = Client()
-    res = cl.delete_dir(path)
-    stat = res['status']
-    if stat != Status.ok:
-        print(Status.description(stat))
-
-
-@cli.command()
 @click.argument('local_path')
 @click.argument('remote_path', default="/")
 def upload(local_path, remote_path):
@@ -73,9 +62,9 @@ def upload(local_path, remote_path):
 @cli.command()
 @click.argument('path')
 def rm(path):
-    """Delete a file"""
+    """Delete a file or directory"""
     cl = Client()
-    res = cl.delete_file(path)
+    res = cl.delete(path)
     stat = res['status']
     if stat != Status.ok:
         print(Status.description(stat))
