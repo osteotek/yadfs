@@ -96,11 +96,10 @@ if __name__ == '__main__':
         exit()
 
     host = sys.argv[1]
-    if sys.argv[2]:
-        port = sys.argv[2]
+    if len(sys.argv) > 2:
+        port = int(sys.argv[2])
     else:
         port = 9999
-
 
     addr = host + ":" + str(port)
     if not os.getenv('YAD_NS'):
