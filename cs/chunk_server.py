@@ -15,7 +15,6 @@ class ChunkServer:
     def __init__(self, addr, ns_addr):
         self.ns = ServerProxy(ns_addr)
         self.addr = addr
-        self.name = name
         self.ns_addr = ns_addr
         self.local_fs_root = "/tmp/yadfs/chunks"
         self.hb_timeout = 0.5  # heartbeat timeout in seconds
