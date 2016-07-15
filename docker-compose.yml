@@ -12,7 +12,7 @@ services:
         build:
             context: .
             dockerfile: cs/Dockerfile
-        image: yadfs:
+        image: yadfs:cs
         tty: true
         stdin_open: true
         environment:
