@@ -4,6 +4,7 @@ from client.client import Client
 from utils.enums import Status, NodeType
 import getpass
 import datetime
+import os
 
 
 # CLI
@@ -53,11 +54,14 @@ def mkdir(path):
 def upload(local_path, remote_path):
     """Create a file"""
     cl = Client()
-    res = cl.create_file(local_path, remote_path)
-    stat = res['status']
-    if stat != Status.ok:
-        print(Status.description(stat))
 
+    if os.path.isdir(local_path):
+        print("You can't upload directory as a file")
+    else:
+        res = cl.create_file(local_path, remote_path)
+        stat = res['status']
+        if stat != Status.ok:
+            print(Status.description(stat))
 
 @cli.command()
 @click.argument('path')
