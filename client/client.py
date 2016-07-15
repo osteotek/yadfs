@@ -47,7 +47,10 @@ class Client:
         return self.ns.delete(path)
 
     def download_file(self, path, dst_path):
-        content = self.get_file_content(path)
+        result, content = self.get_file_content(path)
+        if result != Status.ok:
+            return {'status': result}
+
         fn = path.split("/")[-1]
         self.make_sure_path_exists(dst_path)
         file_path = os.path.join(dst_path, fn)
@@ -57,6 +60,9 @@ class Client:
 
     def get_file_content(self, path):
         info = self.ns.get_file_info(path)
+        if info['status'] != Status.ok:
+            return info['status'], None
+
         chunks = info['chunks']
         content = ""
         data = {}
@@ -71,7 +77,7 @@ class Client:
             content += data[i]
             i += 1
 
-        return content
+        return Status.ok, content
 
     def path_status(self, path):
         return self.ns.get_file_info(path)
