@@ -6,11 +6,15 @@ services:
             context: .
             dockerfile: ns/Dockerfile
         image: yadfs:ns
+        tty: true
+        stdin_open: true
     cs:
         build:
             context: .
             dockerfile: cs/Dockerfile
-        image: yadfs:cs
+        image: yadfs:
+        tty: true
+        stdin_open: true
         environment:
             YAD_NS: http://ns:8888
         depends_on:
