@@ -1,0 +1,34 @@
+version: '2'
+
+services:
+    ns:
+        build:
+            context: .
+            dockerfile: ns/Dockerfile
+        image: yadfs:ns
+    cs:
+        build:
+            context: .
+            dockerfile: cs/Dockerfile
+        image: yadfs:cs
+        environment:
+            YAD_NS: http://ns:8888
+        depends_on:
+            - ns
+        links:
+            - ns
+    client:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: yadfs:client
+        tty: true
+        stdin_open: true
+        environment:
+            YAD_NS: http://ns:8888
+        depends_on:
+            - ns
+            - cs
+        links:
+            - ns
+            - cs
