@@ -86,7 +86,6 @@ class Client:
         
         return Status.ok, info
 
-
     def get_chunk(self, path, chunk_id):
         info = self.ns.get_file_info(path)
         if info['status'] != Status.ok:
