@@ -79,6 +79,26 @@ class Client:
 
         return Status.ok, content
 
+    def get_file_info(self, path):
+        info = self.ns.get_file_info(path)
+        if info['status'] != Status.ok:
+            return info['status'], None
+        
+        return Status.ok, info
+
+
+    def get_chunk(self, path, chunk_id):
+        info = self.ns.get_file_info(path)
+        if info['status'] != Status.ok:
+            return info['status'], None
+        
+        chunks = info['chunks']
+        for chunk, addr in chunks.items():
+            if int(chunk.split("_")[-1]) == chunk_id:
+                cs = ServerProxy(addr)
+                chunk_data = cs.get_chunk(chunk)
+                return Status.ok, chunk_data
+
     def path_status(self, path):
         return self.ns.get_file_info(path)
 
