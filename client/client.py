@@ -9,10 +9,13 @@ from utils.enums import NodeType, Status
 
 
 class Client:
-    def __init__(self):
+    def __init__(self, ns_addr=None):
         self.chunk_servers = []
-        if not os.getenv('YAD_NS'):
+        if ns_addr is not None:
+            os.environ['YAD_NS'] = ns_addr
+        elif not os.getenv('YAD_NS'):
             os.environ['YAD_NS'] = 'http://localhost:8888'
+
         self.ns = ServerProxy(os.environ['YAD_NS'])
 
     def list_dir(self, dir_path):
@@ -27,19 +30,30 @@ class Client:
     def create_file(self, path, remote_path):
         fn = path.split("/")[-1]
         remote_filepath = os.path.join(remote_path, fn)
+
+        if not os.path.isfile(path):
+            return Status.not_found
+
+        with open(path, 'r') as fr:
+            data = fr.read()
+
+        return self._save_file_to_dfs(data, remote_filepath)
+
+    def _save_file_to_dfs(self, content, remote_filepath):
         r = self._get_cs(remote_filepath)
         if not r['status'] == Status.ok:
             return r
         cs_addr = r['cs']
         cs = ServerProxy(cs_addr)
-        chunks = self.split_file(path)
-        data={}
+
+        chunks = self.split_file(content)
+        data = {}
         data['path'] = remote_filepath
-        data['size'] = os.stat(path).st_size
+        data['size'] = len(content)
         data['chunks'] = {}
         for count, chunk in enumerate(chunks):
             cs.upload_chunk(remote_filepath + '_{0}'.format(str(count)), chunk)
-            data['chunks'][remote_filepath+'_'+str(count)] = cs_addr
+            data['chunks'][remote_filepath + '_' + str(count)] = cs_addr
 
         return self.ns.create_file(data)
 
@@ -104,13 +118,32 @@ class Client:
     def _get_cs(self, path):
         return self.ns.get_cs(path)
 
-    @staticmethod
-    def split_file(filename, chunksize=1024):
-        if not os.path.isfile(filename):
-            return Status.not_found
+    def get_chunk(self, path):
+        r_index = path.rindex('_')
+        f_path = path[:r_index]
 
-        with open(filename, 'r') as fr:
-            data = fr.read()
+        info = self.ns.get_file_info(f_path)
+        for chunk, addr in info['chunks'].items():
+            if chunk == path:
+                cs = ServerProxy(addr)
+                return {'status': Status.ok, 'data': cs.get_chunk(chunk)}
+
+        return {'status': Status.not_found}
+
+    def download_to(self, v_path, l_path):
+        st, data = self.get_file_content(v_path)
+        os.makedirs(os.path.dirname(l_path), exist_ok=True)
+        with open(l_path, "w") as f:
+            f.write(data)
+
+        return {'status': Status.ok}
+
+    def save(self, data, path):
+        st = self._save_file_to_dfs(data, path)
+        return {'status': st}
+
+    @staticmethod
+    def split_file(data, chunksize=1024):
         chunks = []
         while len(data) >= chunksize:
             i = chunksize

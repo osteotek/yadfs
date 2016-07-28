@@ -238,15 +238,15 @@ class NameServer:
 
 # args: host and port: localhost 8888
 if __name__ == '__main__':
-    #if len(sys.argv) == 3:
-    #    host = sys.argv[1]
-    #    port = int(sys.argv[2])
-    #else:
-    #    host = 'localhost'
-    #    port = 8888
+    if len(sys.argv) == 3:
+       host = sys.argv[1]
+       port = int(sys.argv[2])
+    else:
+       host = 'localhost'
+       port = 8888
 
-    host = socket.gethostbyname(socket.gethostname())
-    port = 8888
+    # host = socket.gethostbyname(socket.gethostname())
+    # port = 8888
     ns = NameServer(dump_on=True)
     ns.start()
 
