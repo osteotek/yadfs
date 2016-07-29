@@ -92,24 +92,24 @@ class ChunkServer:
 
 # ars: host and port: localhost 9999
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
+''' if len(sys.argv) < 2:
        print("You have to specify address of chunk server")
 
     host = sys.argv[1]
     if len(sys.argv) > 2:
-       port = int(sys.argv[2])
+      port = int(sys.argv[2])
     else:
-       port = 9999
+       port = 9999'''
 
-    # host = socket.gethostbyname(socket.gethostname())
-    # port = 9999
+    host = socket.gethostbyname(socket.gethostname())
+    port = 9999
 
     addr = 'http://' + host + ":" + str(port)
     if not os.getenv('YAD_NS'):
         ns_addr = 'http://localhost:8888'
     else:
         ns_addr = os.environ['YAD_NS']
-    
+
     cs = ChunkServer(addr, ns_addr)
     cs.start()
 
